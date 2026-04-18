@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-    <div class="page-container" style="max-width: 620px;">
+    <div class="page-container" style="max-width: 800px;">
 
         <div class="page-header">
             <div>
@@ -31,18 +31,6 @@
                         <input type="text" id="studentFullName" placeholder="Student's full name" required>
                     </div>
                     <div class="form-group full-width">
-                        <label for="subject">Subject</label>
-                        <input type="text" id="subject" placeholder="e.g. Mathematics" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="caScore">CA Score <span class="text-muted">(max 40)</span></label>
-                        <input type="number" id="caScore" placeholder="0 – 40" min="0" max="40" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="examScore">Exam Score <span class="text-muted">(max 60)</span></label>
-                        <input type="number" id="examScore" placeholder="0 – 60" min="0" max="60" required>
-                    </div>
-                    <div class="form-group full-width">
                         <label for="term">Term</label>
                         <select id="term" required>
                             <option value="First Term">First Term</option>
@@ -50,6 +38,23 @@
                             <option value="Third Term">Third Term</option>
                         </select>
                     </div>
+                </div>
+
+                <div style="margin-top: 2rem; margin-bottom: 2rem; overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 1rem; color: var(--text);">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--border); text-align: left;">
+                                <th style="padding: 10px;">Subject</th>
+                                <th style="padding: 10px; width: 150px;">Test (Max 30)</th>
+                                <th style="padding: 10px; width: 150px;">Exam (Max 70)</th>
+                                <th style="padding: 10px; width: 80px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subjectsBody">
+                            <!-- Predefined Subjects injected by JS -->
+                        </tbody>
+                    </table>
+                    <button type="button" id="addRowBtn" style="background: transparent; border: 1px dashed var(--border); color: var(--text-muted); padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; text-align: center;">+ Add Extra Subject</button>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-full">Post Result</button>

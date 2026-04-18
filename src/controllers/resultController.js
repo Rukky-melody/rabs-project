@@ -2,7 +2,7 @@ const db = require('../config/db');
 
 // TEACHER ACTION: Uploading/Posting scores for a student
 exports.uploadScore = async (req, res) => {
-    const { studentId, studentFullName, subject, caScore, examScore, term } = req.body;
+    const { studentId, studentFullName, term, scores, subject, caScore, examScore } = req.body;
 
     try {
         // First, check if the student ID exists to prevent ghost results
@@ -24,11 +24,17 @@ exports.uploadScore = async (req, res) => {
             VALUES (?, ?, ?, ?, ?, ?)
         `;
         
-        await db.query(query, [studentId, studentFullName, subject, caScore, examScore, term]);
+        if (scores && Array.isArray(scores)) {
+            for (const score of scores) {
+                await db.query(query, [studentId, studentFullName, score.subject, score.caScore, score.examScore, term]);
+            }
+        } else {
+            await db.query(query, [studentId, studentFullName, subject, caScore, examScore, term]);
+        }
 
         res.status(200).json({ 
             success: true, 
-            message: "Result posted successfully to the student portal." 
+            message: "Results posted successfully to the student portal." 
         });
     } catch (error) {
         console.error(error);
