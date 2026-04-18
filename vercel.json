@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://rabs-project.onrender.com/api/:path*"
+    }
+  ]
+}
