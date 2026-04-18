@@ -43,7 +43,7 @@ async function fetchResults() {
             let totalScore = 0;
 
             tbody.innerHTML = data.results.map(row => {
-                const sum = row.ca_score + row.exam_score;
+                const sum = parseFloat(row.ca_score) + parseFloat(row.exam_score);
                 totalScore += sum;
                 const { grade, cls, remark } = getGrade(sum);
 
