@@ -61,6 +61,44 @@
             </form>
         </div>
 
+        <!-- Manage / Delete Results Panel -->
+        <div class="card" style="margin-top: 2rem;">
+            <h3 style="color: var(--text); margin-bottom: 1.5rem;">🗑️ Manage / Delete Results</h3>
+            <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+                <div class="form-group">
+                    <label for="manageStudentId">Student ID</label>
+                    <input type="text" id="manageStudentId" placeholder="RABS-2026-XXXX" style="width:100%;">
+                </div>
+                <div class="form-group">
+                    <label for="manageTerm">Term</label>
+                    <select id="manageTerm" style="width:100%;">
+                        <option value="First Term">First Term</option>
+                        <option value="Second Term">Second Term</option>
+                        <option value="Third Term">Third Term</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display:flex; gap:1rem; margin-bottom:1.5rem;">
+                <button id="loadResultsBtn" class="btn btn-outline" style="flex:1;">🔍 Load Results</button>
+                <button id="deleteTermBtn" class="btn" style="flex:1; background:var(--error-bg); color:var(--error); border:1px solid rgba(239,68,68,0.3);">🗑️ Delete Entire Term</button>
+            </div>
+            <div id="manageMsg"></div>
+            <div id="manageTableContainer" style="display:none; overflow-x:auto;">
+                <table style="width:100%; border-collapse:collapse; color:var(--text);">
+                    <thead>
+                        <tr style="border-bottom:1px solid var(--border); text-align:left;">
+                            <th style="padding:10px;">Subject</th>
+                            <th style="padding:10px;">Test</th>
+                            <th style="padding:10px;">Exam</th>
+                            <th style="padding:10px;">Total</th>
+                            <th style="padding:10px; width:80px;">Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody id="manageResultsBody"></tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
     <script src="../js/theme.js"></script>

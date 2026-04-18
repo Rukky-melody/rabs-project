@@ -100,6 +100,79 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
     }
 });
 
+// ─── Manage / Delete Results Panel ────────────────────────────
+function showManageMsg(msg, isError = false) {
+    const el = document.getElementById('manageMsg');
+    el.innerHTML = `<p style="color:${isError ? 'var(--error)' : 'var(--success, #22c55e)'}; margin-bottom:0.5rem;">${msg}</p>`;
+}
+
+async function loadResults() {
+    const studentId = document.getElementById('manageStudentId').value.trim();
+    const term = document.getElementById('manageTerm').value;
+    if (!studentId) { showManageMsg('Please enter a Student ID.', true); return; }
+
+    const res = await fetch(`/api/staff/results/${encodeURIComponent(studentId)}/${encodeURIComponent(term)}`);
+    const data = await res.json();
+
+    const container = document.getElementById('manageTableContainer');
+    const tbody = document.getElementById('manageResultsBody');
+
+    if (!data.success || data.results.length === 0) {
+        container.style.display = 'none';
+        showManageMsg('No results found for this student and term.', true);
+        return;
+    }
+
+    showManageMsg(`Loaded ${data.results.length} result(s) for ${term}.`);
+    tbody.innerHTML = '';
+
+    data.results.forEach(row => {
+        const total = parseFloat(row.ca_score) + parseFloat(row.exam_score);
+        const tr = document.createElement('tr');
+        tr.style.borderBottom = '1px solid var(--border)';
+        tr.innerHTML = `
+            <td style="padding:10px;">${row.subject}</td>
+            <td style="padding:10px;">${row.ca_score}</td>
+            <td style="padding:10px;">${row.exam_score}</td>
+            <td style="padding:10px;"><strong>${total}</strong></td>
+            <td style="padding:10px; text-align:center;">
+                <button data-id="${row.id}" class="delete-row-btn" style="color:var(--error); background:transparent; border:none; cursor:pointer; font-size:1.2rem;">🗑️</button>
+            </td>
+        `;
+        tr.querySelector('.delete-row-btn').addEventListener('click', async () => {
+            if (!confirm(`Delete "${row.subject}" from ${term}?`)) return;
+            const delRes = await fetch(`/api/staff/result/${row.id}`, { method: 'DELETE' });
+            const delData = await delRes.json();
+            if (delData.success) { tr.remove(); showManageMsg(`"${row.subject}" deleted.`); }
+            else showManageMsg(delData.message, true);
+        });
+        tbody.appendChild(tr);
+    });
+
+    container.style.display = 'block';
+}
+
+document.getElementById('loadResultsBtn').addEventListener('click', loadResults);
+
+document.getElementById('deleteTermBtn').addEventListener('click', async () => {
+    const studentId = document.getElementById('manageStudentId').value.trim();
+    const term = document.getElementById('manageTerm').value;
+    if (!studentId) { showManageMsg('Please enter a Student ID.', true); return; }
+    if (!confirm(`⚠️ Delete ALL ${term} results for student "${studentId}"? This cannot be undone!`)) return;
+
+    const res = await fetch(`/api/staff/results/${encodeURIComponent(studentId)}/${encodeURIComponent(term)}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) {
+        showManageMsg(data.message);
+        document.getElementById('manageTableContainer').style.display = 'none';
+        document.getElementById('manageResultsBody').innerHTML = '';
+    } else {
+        showManageMsg(data.message, true);
+    }
+});
+
+// ─────────────────────────────────────────────────────────────
+
 // Update your logout function to look like this:
 window.logout = function() {
     localStorage.clear();

@@ -90,3 +90,48 @@ exports.getStudentResults = async (req, res) => {
         });
     }
 };
+
+// TEACHER ACTION: Get results for a specific student + term (for manage panel)
+exports.getResultsByTerm = async (req, res) => {
+    const { studentId, term } = req.params;
+    try {
+        const [rows] = await db.query(
+            'SELECT * FROM results WHERE student_id = ? AND term = ? ORDER BY subject ASC',
+            [studentId, term]
+        );
+        res.status(200).json({ success: true, results: rows });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Could not retrieve results." });
+    }
+};
+
+// TEACHER ACTION: Delete a single result row by ID
+exports.deleteResult = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [result] = await db.query('DELETE FROM results WHERE id = ?', [id]);
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: "Result not found." });
+        }
+        res.status(200).json({ success: true, message: "Result deleted successfully." });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Could not delete result." });
+    }
+};
+
+// TEACHER ACTION: Delete all results for a student for a whole term
+exports.deleteTerm = async (req, res) => {
+    const { studentId, term } = req.params;
+    try {
+        const [result] = await db.query(
+            'DELETE FROM results WHERE student_id = ? AND term = ?',
+            [studentId, term]
+        );
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: "No results found for this student and term." });
+        }
+        res.status(200).json({ success: true, message: `All ${term} results deleted successfully.` });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Could not delete term results." });
+    }
+};
