@@ -20,11 +20,10 @@ if (metaEl) {
 
 // Grade helper
 function getGrade(total) {
-    if (total >= 70) return { grade: 'A', cls: 'badge-success',  remark: 'Excellent' };
-    if (total >= 60) return { grade: 'B', cls: 'badge-info',     remark: 'Very Good' };
-    if (total >= 50) return { grade: 'C', cls: 'badge-warning',  remark: 'Good'      };
-    if (total >= 40) return { grade: 'D', cls: 'badge-primary',  remark: 'Fair'      };
-    return              { grade: 'F', cls: 'badge-error',    remark: 'Fail'      };
+    if (total >= 80) return { grade: 'A1', cls: 'badge-success', remark: 'EXCELLENT' };
+    if (total >= 65) return { grade: 'B2', cls: 'badge-info',    remark: 'VERY GOOD' };
+    if (total >= 50) return { grade: 'C4', cls: 'badge-warning', remark: 'CREDIT'    };
+    return              { grade: 'F9', cls: 'badge-error',   remark: 'FAIL'      };
 }
 
 async function fetchResults() {
