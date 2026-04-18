@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration — RABS</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="auth-page">
+        <div class="auth-card">
+
+            <!-- Registration Form -->
+            <div id="formSection">
+                <div class="auth-header">
+                    <div class="auth-icon">📝</div>
+                    <h1>Student Registration</h1>
+                    <p>Enter your details to generate your unique Student ID</p>
+                </div>
+
+                <form id="regForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" placeholder="Enter your full name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dob">Date of Birth</label>
+                        <input type="date" id="dob" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="className">Class</label>
+                        <select id="className" required>
+                            <option value="">— Select your Class —</option>
+                            <option value="JSS 1">JSS 1</option>
+                            <option value="JSS 2">JSS 2</option>
+                            <option value="JSS 3">JSS 3</option>
+                            <option value="SSS 1">SSS 1</option>
+                            <option value="SSS 2">SSS 2</option>
+                            <option value="SSS 3">SSS 3</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full">Register &amp; Generate ID</button>
+                </form>
+
+                <p class="auth-footer">Already registered? <a href="login.html">Login here →</a></p>
+            </div>
+
+            <!-- Success Result -->
+            <div id="resultArea" style="display:none; text-align:center;">
+                <div class="auth-icon" style="color: var(--success);">✅</div>
+                <h1 style="color: var(--success);">Registration Successful!</h1>
+                <p style="margin: 12px 0;">Your unique Student ID is:</p>
+                <div class="result-id-box">
+                    <span id="displayId"></span>
+                </div>
+                <p class="text-muted" style="margin: 12px 0;">Save this ID — you'll need it to login and check your results.</p>
+                <a href="login.html" class="btn btn-primary btn-full mt-4">Proceed to Login →</a>
+            </div>
+
+        </div>
+    </div>
+    <script src="../js/theme.js"></script>
+    <script src="../js/studentRegister.js"></script>
+</body>
+</html>

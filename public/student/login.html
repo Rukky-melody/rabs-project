@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Login — RABS</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="auth-page">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-icon">🎒</div>
+                <h1>Student Portal</h1>
+                <p>Enter your Student ID to view your results</p>
+            </div>
+
+            <form id="studentLoginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="studentId">Student ID</label>
+                    <input type="text" id="studentId" placeholder="e.g. RABS-2026-9396" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">View My Results →</button>
+            </form>
+
+            <p class="auth-footer">Don't have an ID? <a href="register.html">Register here →</a></p>
+        </div>
+    </div>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/student-app.js"></script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Results — RABS</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; color: #000 !important; }
+            .card { box-shadow: none !important; border: 1px solid #ccc !important; }
+            thead th { background: #f1f5f9 !important; color: #000 !important; }
+            tbody td { color: #000 !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+
+        <!-- Student Info Card -->
+        <div class="card card-info no-print" id="studentInfoCard">
+            <div class="card-header">
+                <span style="font-size:1.5rem;">🎓</span>
+                <h2 id="welcomeMsg">Loading...</h2>
+            </div>
+            <div class="info-row" id="studentMeta"></div>
+        </div>
+
+        <!-- Results Card -->
+        <div class="card">
+            <div class="card-header">
+                <span style="font-size:1.4rem;">📊</span>
+                <h2>Academic Results</h2>
+                <div class="no-print" style="margin-left:auto; display:flex; gap:10px;">
+                    <a href="#" onclick="window.print(); return false;" class="btn btn-outline btn-sm">📥 Print</a>
+                    <button onclick="logout()" class="btn btn-sm" style="background:var(--error-bg); color:var(--error); border:1px solid rgba(239,68,68,0.2);">Logout</button>
+                </div>
+            </div>
+
+            <div id="loadingSpinner" class="spinner"></div>
+
+            <div id="resultsSection" style="display:none;">
+                <div class="table-wrapper">
+                    <table id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>CA Score</th>
+                                <th>Exam Score</th>
+                                <th>Total</th>
+                                <th>Grade</th>
+                                <th>Remarks</th>
+                                <th>Term</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsBody"></tbody>
+                    </table>
+                </div>
+
+                <div style="text-align:right; margin-top:16px; font-weight:600; color:var(--text-heading);">
+                    Overall Average: <span id="overallAverage" style="color:var(--primary-light);">--</span>
+                </div>
+            </div>
+
+            <div id="emptyState" style="display:none;" class="text-center" style="padding:40px 0;">
+                <p style="font-size:2rem; margin-bottom:8px;">📭</p>
+                <p class="text-muted">No results uploaded yet. Check back later.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/student-dashboard.js"></script>
+</body>
+</html>

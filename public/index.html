@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RABS — Result & Academic Broadcast System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="auth-page">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-icon">🎓</div>
+                <h1>RABS Portal</h1>
+                <p>Result &amp; Academic Broadcast System<br>
+                <span style="font-size:0.8rem; color: var(--text-muted);">Select your portal to continue</span></p>
+            </div>
+
+            <div class="portal-nav">
+                <button class="btn btn-primary btn-full" onclick="location.href='student/login.html'">
+                    🎒 Student Portal
+                </button>
+                <button class="btn btn-outline btn-full" onclick="location.href='teacher/login.html'">
+                    📋 Staff / Teacher Login
+                </button>
+                <button class="btn btn-success btn-full" onclick="location.href='student/register.html'">
+                    ✨ New Student? Register Here
+                </button>
+            </div>
+
+            <p class="auth-footer" style="margin-top: 24px;">Admin access requires Staff Login</p>
+        </div>
+    </div>
+    <script src="js/theme.js"></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Login — RABS</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="auth-page">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-icon">📋</div>
+                <h1>Staff / Teacher Login</h1>
+                <p>Enter your credentials to access the results portal</p>
+            </div>
+
+            <form id="teacherLoginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="staffId">Staff ID</label>
+                    <input type="text" id="staffId" placeholder="e.g. TCH-2026-01" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Login →</button>
+            </form>
+
+            <p class="auth-footer"><a href="../index.html">← Back to Home</a></p>
+        </div>
+    </div>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/teacher-login.js"></script>
+</body>
+</html>

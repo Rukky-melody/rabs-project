@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Staff Registration</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Register New Staff</h2>
+        <form id="adminRegForm">
+            <input type="text" id="staffId" placeholder="Assign Staff ID" required>
+            <input type="password" id="password" placeholder="Set Password" required>
+            <select id="role">
+                <option value="teacher">Teacher</option>
+                <option value="admin">Admin</option>
+            </select>
+            <button type="submit">Create Account</button>
+        </form>
+    </div>
+    <script src="../js/admin-reg.js"></script>
+</body>
+</html>
