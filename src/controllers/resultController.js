@@ -26,10 +26,36 @@ exports.uploadScore = async (req, res) => {
         
         if (scores && Array.isArray(scores)) {
             for (const score of scores) {
-                await db.query(query, [studentId, studentFullName, score.subject, score.caScore, score.examScore, term]);
+                // Check if result already exists
+                const [existing] = await db.query(
+                    'SELECT id FROM results WHERE student_id = ? AND subject = ? AND term = ?',
+                    [studentId, score.subject, term]
+                );
+
+                if (existing.length > 0) {
+                    await db.query(
+                        'UPDATE results SET ca_score = ?, exam_score = ? WHERE id = ?',
+                        [score.caScore, score.examScore, existing[0].id]
+                    );
+                } else {
+                    await db.query(query, [studentId, studentFullName, score.subject, score.caScore, score.examScore, term]);
+                }
             }
         } else {
-            await db.query(query, [studentId, studentFullName, subject, caScore, examScore, term]);
+            // Fallback
+            const [existing] = await db.query(
+                'SELECT id FROM results WHERE student_id = ? AND subject = ? AND term = ?',
+                [studentId, subject, term]
+            );
+
+            if (existing.length > 0) {
+                await db.query(
+                    'UPDATE results SET ca_score = ?, exam_score = ? WHERE id = ?',
+                    [caScore, examScore, existing[0].id]
+                );
+            } else {
+                await db.query(query, [studentId, studentFullName, subject, caScore, examScore, term]);
+            }
         }
 
         res.status(200).json({ 

@@ -46,6 +46,8 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
     
     const rows = document.querySelectorAll('#subjectsBody tr');
     const scores = [];
+    const subjectsSet = new Set();
+    let hasDuplicate = false;
     
     rows.forEach(row => {
         const subject = row.querySelector('.subject-input').value.trim();
@@ -53,6 +55,12 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
         const examScore = row.querySelector('.exam-input').value;
         
         if (subject && (caScore !== "" || examScore !== "")) {
+            const lowerSub = subject.toLowerCase();
+            if (subjectsSet.has(lowerSub)) {
+                hasDuplicate = true;
+            }
+            subjectsSet.add(lowerSub);
+            
             scores.push({
                 subject,
                 caScore: caScore ? parseFloat(caScore) : 0,
@@ -60,6 +68,11 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             });
         }
     });
+
+    if (hasDuplicate) {
+        alert("Duplicate subjects detected! You cannot enter the same subject twice in one upload.");
+        return;
+    }
 
     if(scores.length === 0) {
         alert("Please enter scores for at least one subject!");
