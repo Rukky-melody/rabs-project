@@ -1,11 +1,17 @@
 // Gatekeeper: redirect if not logged in
 const studentId   = localStorage.getItem('currentStudentId');
 const studentName = localStorage.getItem('studentName');
-const studentClass = localStorage.getItem('studentClass') || 'N/A'; // Assuming class is saved, else fallback
+const studentClass = localStorage.getItem('studentClass') || 'N/A';
 
 if (!studentId) {
     window.location.href = 'login.html';
 }
+
+// Populate the side drawer
+const drawerNameEl = document.getElementById('drawerName');
+const drawerIdEl   = document.getElementById('drawerId');
+if (drawerNameEl) drawerNameEl.textContent = studentName || 'Student';
+if (drawerIdEl)   drawerIdEl.textContent   = studentId || '';
 
 const affectiveTraitsList = ["Honesty", "Cleanliness", "Punctuality", "Attentiveness", "Carefulness", "Considerate", "Politeness", "Obedience", "Promptness"];
 const psychomotorTraitsList = ["Track Events", "Field Events", "Sings Alone", "Dance to beat", "Drawing and Painting"];

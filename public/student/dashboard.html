@@ -16,25 +16,115 @@
             color: #000;
             padding: 40px;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            position: relative;
         }
 
-        /* ── Controls ── */
-        .controls {
+        /* ── Top Bar ── */
+        .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 8px;
         }
-        .controls > .ctrl-right { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .top-bar-left { display: flex; align-items: center; gap: 10px; }
+
         .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; }
-        .btn-print { background: #3b82f6; color: white; }
-        .btn-logout { background: #ef4444; color: white; }
         .btn-back { background: #e5e7eb; color: #374151; }
+        .btn-logout { background: #ef4444; color: white; width: 100%; text-align: left; padding: 12px 16px; border-radius: 0; }
         .term-selector { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; }
 
-        /* ── Header ── */
+        /* ── Hamburger Button ── */
+        .hamburger {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .hamburger:hover { background: #e5e7eb; }
+        .hamburger span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: #374151;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+        /* Animated X when open */
+        .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        /* ── Side Drawer ── */
+        .drawer-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 99;
+        }
+        .drawer-overlay.open { display: block; }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: -280px;
+            width: 260px;
+            height: 100%;
+            background: #fff;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+            z-index: 100;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .drawer.open { right: 0; }
+
+        .drawer-header {
+            background: #003366;
+            color: white;
+            padding: 20px 16px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .drawer-photo {
+            margin: 20px auto;
+            width: 110px;
+            height: 130px;
+            background: #e5e7eb;
+            border: 2px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .drawer-name {
+            text-align: center;
+            font-weight: bold;
+            font-size: 15px;
+            color: #1e293b;
+            padding: 0 16px 6px;
+        }
+        .drawer-id {
+            text-align: center;
+            font-size: 12px;
+            color: #64748b;
+            padding: 0 16px 20px;
+        }
+
+        .drawer-divider { height: 1px; background: #e5e7eb; margin: 0 16px; }
+
+        .drawer-footer { margin-top: auto; }
+
+        /* ── Report Header ── */
         .header {
             display: flex;
             justify-content: space-between;
@@ -111,6 +201,23 @@
         .comments-table td { border: 2px solid #000; padding: 10px; font-size: 13px; vertical-align: top; }
         .comments-table td.label { font-weight: bold; width: 28%; }
 
+        /* ── Download Result Button (bottom) ── */
+        .download-btn-wrap { margin-top: 30px; text-align: center; }
+        .btn-download {
+            background: #003366;
+            color: white;
+            padding: 14px 40px;
+            font-size: 15px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            width: 100%;
+            transition: background 0.2s;
+        }
+        .btn-download:hover { background: #00509e; }
+
         /* ── Loading / Empty ── */
         #loadingState, #emptyState { text-align: center; padding: 40px; font-size: 18px; color: #666; display: none; }
 
@@ -122,6 +229,7 @@
             .table-scroll, .behavior-scroll { overflow: visible; }
             .data-table, .behavior-table { min-width: unset; }
             .behavior-grid { grid-template-columns: 1fr 1fr; }
+            .drawer, .drawer-overlay { display: none !important; }
         }
 
         /* ── MOBILE ≤ 600px ── */
@@ -129,12 +237,7 @@
             body { padding: 8px; }
             .report-container { padding: 14px; }
 
-            /* Controls stack into two columns of buttons */
-            .controls { flex-direction: column; align-items: stretch; gap: 10px; }
-            .controls > .ctrl-right { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-            .controls .btn, .controls .term-selector { width: 100%; text-align: center; padding: 10px 8px; }
-
-            /* Header stacks vertically */
+            /* Header stacks vertically — photo now in drawer, so only title + logo */
             .header { flex-direction: column; align-items: center; text-align: center; gap: 10px; }
             .header-center h1 { font-size: 15px; letter-spacing: 1px; }
             .header-center h2 { font-size: 11px; }
@@ -171,20 +274,38 @@
 </head>
 <body>
 
+    <!-- Drawer Overlay -->
+    <div class="drawer-overlay no-print" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+    <!-- Side Drawer -->
+    <div class="drawer no-print" id="drawer">
+        <div class="drawer-header">&#128100; My Profile</div>
+        <div class="drawer-photo">STUDENT<br>PHOTO</div>
+        <div class="drawer-name" id="drawerName">Loading...</div>
+        <div class="drawer-id" id="drawerId"></div>
+        <div class="drawer-divider"></div>
+        <div class="drawer-footer">
+            <button onclick="logout()" class="btn btn-logout">&#128275; Logout</button>
+        </div>
+    </div>
+
     <div class="report-container">
 
-        <!-- Controls (hidden on print) -->
-        <div class="controls no-print">
-            <button onclick="window.history.back()" class="btn btn-back">&larr; Back</button>
-            <div class="ctrl-right">
+        <!-- Top Bar (hidden on print) -->
+        <div class="top-bar no-print">
+            <div class="top-bar-left">
+                <button onclick="window.history.back()" class="btn btn-back">&larr; Back</button>
                 <select id="termSelector" class="term-selector">
                     <option value="First Term">First Term</option>
                     <option value="Second Term">Second Term</option>
                     <option value="Third Term">Third Term</option>
                 </select>
-                <button onclick="window.print()" class="btn btn-print">&#128424; Print</button>
-                <button onclick="logout()" class="btn btn-logout">Logout</button>
             </div>
+            <button class="hamburger" id="hamburgerBtn" onclick="toggleDrawer()" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
 
         <div id="loadingState">Loading your results...</div>
@@ -192,15 +313,15 @@
 
         <div id="reportContent" style="display:none;">
 
-            <!-- Header -->
+            <!-- Report Header -->
             <div class="header">
-                <div class="img-placeholder">STUDENT<br>PHOTO</div>
+                <div class="img-placeholder">SCHOOL<br>LOGO</div>
                 <div class="header-center">
                     <h1>SUCCESS HERITAGE<br>MODERN ACADEMY</h1>
                     <h2>Academic Report Sheet: <span id="displayTerm">--</span> <span id="displaySession">--</span></h2>
                     <h3>Achievement of Cognitive Domain</h3>
                 </div>
-                <div class="img-placeholder logo-placeholder">SCHOOL<br>LOGO</div>
+                <div class="img-placeholder logo-placeholder">SCHOOL<br>SEAL</div>
             </div>
 
             <!-- Student Info Block -->
@@ -272,7 +393,6 @@
 
             <!-- Behavioral Domains -->
             <div class="behavior-grid">
-                <!-- Affective -->
                 <div>
                     <div class="behavior-header">Assessment of Affective Domain</div>
                     <div class="behavior-scroll">
@@ -287,8 +407,6 @@
                         </table>
                     </div>
                 </div>
-
-                <!-- Psychomotor -->
                 <div>
                     <div class="behavior-header">Psychomotor Assessment:</div>
                     <div class="behavior-scroll">
@@ -317,9 +435,29 @@
                 </tr>
             </table>
 
+            <!-- Download Result Button (very bottom) -->
+            <div class="download-btn-wrap no-print">
+                <button onclick="window.print()" class="btn-download">&#11015; Download Result</button>
+            </div>
+
         </div>
     </div>
 
+    <script>
+        function toggleDrawer() {
+            const drawer = document.getElementById('drawer');
+            const overlay = document.getElementById('drawerOverlay');
+            const btn = document.getElementById('hamburgerBtn');
+            drawer.classList.toggle('open');
+            overlay.classList.toggle('open');
+            btn.classList.toggle('open');
+        }
+        function closeDrawer() {
+            document.getElementById('drawer').classList.remove('open');
+            document.getElementById('drawerOverlay').classList.remove('open');
+            document.getElementById('hamburgerBtn').classList.remove('open');
+        }
+    </script>
     <script src="../js/student-dashboard.js"></script>
 </body>
 </html>
