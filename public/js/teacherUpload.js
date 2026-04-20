@@ -9,6 +9,33 @@ if (!localStorage.getItem('currentStaffId')) {
 const defaultSubjects = ["Mathematics", "English Language", "Civic Education", "Biology", "Chemistry"];
 const tbody = document.getElementById('subjectsBody');
 
+// Traits data
+const affectiveTraits = ["Honesty", "Cleanliness", "Punctuality", "Attentiveness", "Carefulness", "Considerate", "Politeness", "Obedience", "Promptness"];
+const psychomotorTraits = ["Track Events", "Field Events", "Sings Alone", "Dance to beat", "Drawing and Painting"];
+
+function renderTraits(containerId, traits) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    traits.forEach(trait => {
+        const div = document.createElement('div');
+        div.style.display = 'flex';
+        div.style.justifyContent = 'space-between';
+        div.style.alignItems = 'center';
+        
+        let radios = '';
+        for (let i = 1; i <= 5; i++) {
+            radios += `<label style="display:inline-flex; align-items:center; gap:2px;"><input type="radio" name="${trait}" value="${i}"> ${i}</label>`;
+        }
+        
+        div.innerHTML = `<span style="width: 150px;">${trait}</span> <div style="display:flex; gap:10px;">${radios}</div>`;
+        container.appendChild(div);
+    });
+}
+
+renderTraits('affectiveTraitsContainer', affectiveTraits);
+renderTraits('psychomotorTraitsContainer', psychomotorTraits);
+
 function createRow(subject = "") {
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -79,7 +106,31 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
         return;
     }
 
-    const payload = { studentId, studentFullName, term, scores };
+    // Collect Metadata
+    const affectiveResults = {};
+    affectiveTraits.forEach(trait => {
+        const checked = document.querySelector(`input[name="${trait}"]:checked`);
+        affectiveResults[trait] = checked ? parseInt(checked.value) : 0;
+    });
+
+    const psychomotorResults = {};
+    psychomotorTraits.forEach(trait => {
+        const checked = document.querySelector(`input[name="${trait}"]:checked`);
+        psychomotorResults[trait] = checked ? parseInt(checked.value) : 0;
+    });
+
+    const metadata = {
+        session: document.getElementById('session').value || '',
+        timesSchoolOpened: parseInt(document.getElementById('timesSchoolOpened').value) || 0,
+        daysPresent: parseInt(document.getElementById('daysPresent').value) || 0,
+        daysAbsent: parseInt(document.getElementById('daysAbsent').value) || 0,
+        teacherComment: document.getElementById('teacherComment').value || '',
+        principalComment: document.getElementById('principalComment').value || '',
+        affectiveTraits: affectiveResults,
+        psychomotorTraits: psychomotorResults
+    };
+
+    const payload = { studentId, studentFullName, term, scores, metadata };
 
     const response = await fetch('/api/staff/upload-score', {
         method: 'POST',

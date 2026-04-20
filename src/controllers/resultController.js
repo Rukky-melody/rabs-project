@@ -2,7 +2,7 @@ const db = require('../config/db');
 
 // TEACHER ACTION: Uploading/Posting scores for a student
 exports.uploadScore = async (req, res) => {
-    const { studentId, studentFullName, term, scores, subject, caScore, examScore } = req.body;
+    const { studentId, studentFullName, term, scores, subject, caScore, examScore, metadata } = req.body;
 
     try {
         // First, check if the student ID exists to prevent ghost results
@@ -16,6 +16,37 @@ exports.uploadScore = async (req, res) => {
                 success: false, 
                 message: "Student ID not found. Verify the ID and try again." 
             });
+        }
+
+        // Handle Metadata
+        if (metadata) {
+            const {
+                session, timesSchoolOpened, daysPresent, daysAbsent,
+                teacherComment, principalComment, affectiveTraits, psychomotorTraits
+            } = metadata;
+
+            // Upsert metadata
+            const [existingMeta] = await db.query(
+                'SELECT id FROM report_metadata WHERE student_id = ? AND term = ?',
+                [studentId, term]
+            );
+
+            if (existingMeta.length > 0) {
+                await db.query(
+                    `UPDATE report_metadata SET 
+                        session = ?, times_school_opened = ?, days_present = ?, days_absent = ?, 
+                        teacher_comment = ?, principal_comment = ?, affective_traits = ?, psychomotor_traits = ?
+                    WHERE id = ?`,
+                    [session, timesSchoolOpened, daysPresent, daysAbsent, teacherComment, principalComment, JSON.stringify(affectiveTraits), JSON.stringify(psychomotorTraits), existingMeta[0].id]
+                );
+            } else {
+                await db.query(
+                    `INSERT INTO report_metadata 
+                        (student_id, term, session, times_school_opened, days_present, days_absent, teacher_comment, principal_comment, affective_traits, psychomotor_traits) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                    [studentId, term, session, timesSchoolOpened, daysPresent, daysAbsent, teacherComment, principalComment, JSON.stringify(affectiveTraits), JSON.stringify(psychomotorTraits)]
+                );
+            }
         }
 
         // Insert the scores into the results table
@@ -60,7 +91,7 @@ exports.uploadScore = async (req, res) => {
 
         res.status(200).json({ 
             success: true, 
-            message: "Results posted successfully to the student portal." 
+            message: "Results and metadata posted successfully to the student portal." 
         });
     } catch (error) {
         console.error(error);
@@ -79,11 +110,15 @@ exports.getStudentResults = async (req, res) => {
         const query = 'SELECT * FROM results WHERE student_id = ? ORDER BY term ASC';
         const [rows] = await db.query(query, [studentId]);
 
+        const [metaRows] = await db.query('SELECT * FROM report_metadata WHERE student_id = ?', [studentId]);
+
         res.status(200).json({ 
             success: true, 
-            results: rows 
+            results: rows,
+            metadata: metaRows
         });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ 
             success: false, 
             message: "Could not retrieve results." 

@@ -1,82 +1,157 @@
 // Gatekeeper: redirect if not logged in
 const studentId   = localStorage.getItem('currentStudentId');
 const studentName = localStorage.getItem('studentName');
+const studentClass = localStorage.getItem('studentClass') || 'N/A'; // Assuming class is saved, else fallback
 
 if (!studentId) {
     window.location.href = 'login.html';
 }
 
-// Populate welcome message and info row
-document.getElementById('welcomeMsg').innerText = `Welcome, ${studentName || 'Student'}!`;
+const affectiveTraitsList = ["Honesty", "Cleanliness", "Punctuality", "Attentiveness", "Carefulness", "Considerate", "Politeness", "Obedience", "Promptness"];
+const psychomotorTraitsList = ["Track Events", "Field Events", "Sings Alone", "Dance to beat", "Drawing and Painting"];
 
-const metaEl = document.getElementById('studentMeta');
-if (metaEl) {
-    metaEl.innerHTML = `
-        <div class="info-item">
-            <span class="info-label">Student ID</span>
-            <span class="info-value">${studentId}</span>
-        </div>`;
-}
-
-// Grade helper
+// Grade helper based on image
 function getGrade(total) {
-    if (total >= 80) return { grade: 'A1', cls: 'badge-success', remark: 'EXCELLENT' };
-    if (total >= 65) return { grade: 'B2', cls: 'badge-info',    remark: 'VERY GOOD' };
-    if (total >= 50) return { grade: 'C4', cls: 'badge-warning', remark: 'CREDIT'    };
-    return              { grade: 'F9', cls: 'badge-error',   remark: 'FAIL'      };
+    if (total >= 80) return { grade: 'A', remark: 'EXCELLENT' };
+    if (total >= 70) return { grade: 'B', remark: 'VERY GOOD' };
+    if (total >= 60) return { grade: 'C', remark: 'GOOD' };
+    if (total >= 50) return { grade: 'D', remark: 'FAIR' };
+    if (total >= 40) return { grade: 'E', remark: 'POOR' };
+    return              { grade: 'F', remark: 'VERY POOR' };
 }
 
-async function fetchResults() {
-    const spinner        = document.getElementById('loadingSpinner');
-    const resultsSection = document.getElementById('resultsSection');
-    const emptyState     = document.getElementById('emptyState');
+async function fetchResults(term = 'First Term') {
+    const loadingState = document.getElementById('loadingState');
+    const reportContent = document.getElementById('reportContent');
+    const emptyState   = document.getElementById('emptyState');
+
+    loadingState.style.display = 'block';
+    reportContent.style.display = 'none';
+    emptyState.style.display = 'none';
 
     try {
         const response = await fetch(`/api/student/my-results/${studentId}`);
         const data     = await response.json();
 
-        if (spinner) spinner.style.display = 'none';
+        loadingState.style.display = 'none';
 
         if (data.success && data.results && data.results.length > 0) {
-            const tbody = document.getElementById('resultsBody');
+            // Filter results by selected term
+            const termResults = data.results.filter(r => r.term === term);
+            
+            if(termResults.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            // Find metadata for this term
+            const metadataArr = data.metadata || [];
+            const termMetadata = metadataArr.find(m => m.term === term) || {};
+
+            // --- Populate Header ---
+            document.getElementById('displayTerm').innerText = term;
+            document.getElementById('displaySession').innerText = termMetadata.session || 'N/A';
+
+            // --- Populate Student Info Block ---
+            // Split studentName into Surname and Other names if possible
+            const nameParts = (studentName || '').split(' ');
+            const surname = nameParts.length > 0 ? nameParts[0] : '--';
+            const otherNames = nameParts.slice(1).join(' ') || '--';
+            
+            document.getElementById('lblSurname').innerText = surname.toUpperCase();
+            document.getElementById('lblOtherNames').innerText = otherNames.toUpperCase();
+            document.getElementById('lblClass').innerText = studentClass;
+            document.getElementById('lblSex').innerText = 'N/A'; // Assuming not in DB
+            
+            document.getElementById('lblNoInClass').innerText = 'N/A';
+            document.getElementById('lblSchoolOpened').innerText = termMetadata.times_school_opened || '--';
+            document.getElementById('lblDaysPresent').innerText = termMetadata.days_present || '--';
+            document.getElementById('lblDaysAbsent').innerText = termMetadata.days_absent || '--';
+
+            // --- Populate Cognitive Domain ---
+            const tbody = document.getElementById('cognitiveBody');
             let totalScore = 0;
 
-            tbody.innerHTML = data.results.map(row => {
+            tbody.innerHTML = termResults.map(row => {
                 const sum = parseFloat(row.ca_score) + parseFloat(row.exam_score);
                 totalScore += sum;
-                const { grade, cls, remark } = getGrade(sum);
+                const { grade, remark } = getGrade(sum);
 
                 return `
                 <tr>
-                    <td>${row.subject}</td>
+                    <td>${row.subject.toUpperCase()}</td>
                     <td>${row.ca_score}</td>
                     <td>${row.exam_score}</td>
                     <td><strong>${sum}</strong></td>
-                    <td><span class="badge ${cls}">${grade}</span></td>
+                    <td><strong>${grade}</strong></td>
                     <td>${remark}</td>
-                    <td>${row.term}</td>
                 </tr>`;
             }).join('');
 
-            const avg = (totalScore / data.results.length).toFixed(2);
-            document.getElementById('overallAverage').innerText = avg;
+            // --- Populate Summary Block ---
+            document.getElementById('lblTotalScore').innerText = totalScore.toFixed(2);
+            
+            // Calculate term averages
+            const firstTermResults = data.results.filter(r => r.term === 'First Term');
+            const secondTermResults = data.results.filter(r => r.term === 'Second Term');
+            const thirdTermResults = data.results.filter(r => r.term === 'Third Term');
+            
+            const calcAve = (arr) => arr.length > 0 ? (arr.reduce((acc, r) => acc + parseFloat(r.ca_score) + parseFloat(r.exam_score), 0) / arr.length).toFixed(2) + '%' : '0.00%';
+            
+            document.getElementById('lbl1stTermAve').innerText = calcAve(firstTermResults);
+            document.getElementById('lbl2ndTermAve').innerText = calcAve(secondTermResults);
+            document.getElementById('lbl3rdTermAve').innerText = calcAve(thirdTermResults);
+            
+            const currentTermAve = calcAve(termResults);
+            document.getElementById('lblClassAverage').innerText = currentTermAve; // Placeholder
+            
+            const overallNum = parseFloat(currentTermAve);
+            document.getElementById('lblOverallGrade').innerText = getGrade(overallNum).grade;
 
-            if (resultsSection) resultsSection.style.display = 'block';
+            // --- Populate Behavioral Domains ---
+            let affTraitsObj = {};
+            let psyTraitsObj = {};
+            try {
+                affTraitsObj = typeof termMetadata.affective_traits === 'string' ? JSON.parse(termMetadata.affective_traits) : (termMetadata.affective_traits || {});
+                psyTraitsObj = typeof termMetadata.psychomotor_traits === 'string' ? JSON.parse(termMetadata.psychomotor_traits) : (termMetadata.psychomotor_traits || {});
+            } catch(e) {}
+
+            const generateTraitRow = (traitName, scoreObj) => {
+                const score = scoreObj[traitName] || 0;
+                let cells = '';
+                for(let i=5; i>=1; i--) {
+                    cells += `<td>${score === i ? '&#10003;' : ''}</td>`; // Checkmark
+                }
+                return `<tr><td>${traitName}</td>${cells}</tr>`;
+            };
+
+            document.getElementById('affectiveBody').innerHTML = affectiveTraitsList.map(t => generateTraitRow(t, affTraitsObj)).join('');
+            document.getElementById('psychomotorBody').innerHTML = psychomotorTraitsList.map(t => generateTraitRow(t, psyTraitsObj)).join('');
+
+            // --- Comments ---
+            document.getElementById('lblTeacherComment').innerText = termMetadata.teacher_comment || '--';
+            document.getElementById('lblPrincipalComment').innerText = termMetadata.principal_comment || '--';
+
+            reportContent.style.display = 'block';
         } else {
-            if (emptyState) emptyState.style.display = 'block';
+            emptyState.style.display = 'block';
         }
     } catch (err) {
-        if (spinner) spinner.style.display = 'none';
-        if (emptyState) {
-            emptyState.style.display = 'block';
-            emptyState.innerHTML = '<p style="color:var(--error);">Failed to load results. Please try again.</p>';
-        }
+        console.error(err);
+        loadingState.style.display = 'none';
+        emptyState.style.display = 'block';
+        emptyState.innerHTML = '<p style="color:var(--error);">Failed to load results. Please try again.</p>';
     }
 }
+
+document.getElementById('termSelector').addEventListener('change', (e) => {
+    fetchResults(e.target.value);
+});
 
 function logout() {
     localStorage.clear();
     window.location.href = 'login.html';
 }
 
-fetchResults();
+// Initial fetch
+fetchResults('First Term');

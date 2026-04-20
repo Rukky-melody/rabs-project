@@ -46,6 +46,27 @@ async function setupDatabase() {
         `);
         console.log("✅ Results table created successfully.");
 
+        // 4. Create Report Metadata Table
+        await db.query(`
+            CREATE TABLE IF NOT EXISTS report_metadata (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                student_id VARCHAR(255) NOT NULL,
+                term VARCHAR(100) NOT NULL,
+                session VARCHAR(100),
+                times_school_opened INT,
+                days_present INT,
+                days_absent INT,
+                teacher_comment TEXT,
+                principal_comment TEXT,
+                affective_traits JSON,
+                psychomotor_traits JSON,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE KEY unique_student_term (student_id, term),
+                FOREIGN KEY (student_id) REFERENCES students(generated_id) ON DELETE CASCADE
+            )
+        `);
+        console.log("✅ Report Metadata table created successfully.");
+
         console.log("🎉 Database setup is completely finished! You can now use the application.");
         process.exit(0);
     } catch (error) {
