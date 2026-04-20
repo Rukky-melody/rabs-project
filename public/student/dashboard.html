@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Academic Report Sheet — RABS</title>
     <style>
-        /* Base Reset & Variables */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
         body { background: #f4f4f5; display: flex; justify-content: center; padding: 20px; }
-        
-        /* The Report Container (A4 Proportions) */
+
+        /* ── Report Container ── */
         .report-container {
             width: 800px;
             max-width: 100%;
@@ -19,24 +18,23 @@
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
 
-        /* Controls for User/Print */
+        /* ── Controls ── */
         .controls {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 8px;
         }
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-        }
+        .controls > .ctrl-right { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; }
         .btn-print { background: #3b82f6; color: white; }
         .btn-logout { background: #ef4444; color: white; }
-        .term-selector { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .btn-back { background: #e5e7eb; color: #374151; }
+        .term-selector { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; }
 
-        /* Report Header */
+        /* ── Header ── */
         .header {
             display: flex;
             justify-content: space-between;
@@ -44,15 +42,22 @@
             border-bottom: 2px solid #003366;
             padding-bottom: 10px;
             margin-bottom: 20px;
+            gap: 10px;
         }
-        .header-center { text-align: center; color: #003366; flex: 1; }
-        .header-center h1 { font-size: 24px; letter-spacing: 2px; margin-bottom: 5px; }
-        .header-center h2 { font-size: 16px; margin-bottom: 5px; color: #333; }
-        .header-center h3 { font-size: 14px; font-style: italic; color: #333; }
-        .img-placeholder { width: 100px; height: 120px; background: #e5e7eb; border: 1px solid #ccc; display:flex; align-items:center; justify-content:center; color:#9ca3af; font-size:12px; text-align:center;}
-        .logo-placeholder { width: 100px; height: 100px; border-radius: 50%; }
+        .header-center { text-align: center; color: #003366; flex: 1; min-width: 0; }
+        .header-center h1 { font-size: 22px; letter-spacing: 2px; margin-bottom: 5px; }
+        .header-center h2 { font-size: 15px; margin-bottom: 5px; color: #333; }
+        .header-center h3 { font-size: 13px; font-style: italic; color: #333; }
+        .img-placeholder {
+            width: 100px; height: 120px;
+            background: #e5e7eb; border: 1px solid #ccc;
+            display: flex; align-items: center; justify-content: center;
+            color: #9ca3af; font-size: 11px; text-align: center;
+            flex-shrink: 0;
+        }
+        .logo-placeholder { border-radius: 50%; width: 100px; height: 100px; }
 
-        /* Info Blocks */
+        /* ── Info Grids ── */
         .info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -60,9 +65,9 @@
             margin-bottom: 20px;
         }
         .info-table { width: 100%; border-collapse: collapse; }
-        .info-table td { padding: 8px; border-bottom: 1px solid #ccc; }
-        .info-table td:first-child { font-weight: bold; width: 40%; }
-        
+        .info-table td { padding: 8px 6px; border-bottom: 1px solid #ccc; font-size: 13px; word-break: break-word; }
+        .info-table td:first-child { font-weight: bold; width: 55%; }
+
         .summary-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -70,81 +75,114 @@
             margin-bottom: 20px;
         }
 
-        /* Domain Section Headers */
+        /* ── Section Header ── */
         .section-header {
-            background: #003366;
-            color: white;
-            padding: 8px;
-            font-weight: bold;
-            font-size: 14px;
+            background: #003366; color: white;
+            padding: 8px; font-weight: bold; font-size: 14px;
             margin-bottom: 10px;
         }
 
-        /* Data Tables */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            font-size: 13px;
-        }
-        .data-table th, .data-table td {
-            border: 2px solid #000;
-            padding: 8px;
-            text-align: center;
-        }
+        /* ── Cognitive Domain Table ── */
+        .table-scroll { overflow-x: auto; margin-bottom: 20px; -webkit-overflow-scrolling: touch; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 400px; }
+        .data-table th, .data-table td { border: 2px solid #000; padding: 7px 6px; text-align: center; }
         .data-table th { font-weight: bold; }
         .data-table td:first-child { text-align: left; font-weight: bold; }
 
-        /* Behavior Grids */
+        /* ── Behavior Tables ── */
         .behavior-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
             margin-bottom: 20px;
         }
-        .behavior-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .behavior-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .behavior-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 200px; }
         .behavior-table th, .behavior-table td { border: 2px solid #000; padding: 4px; text-align: center; }
         .behavior-table td:first-child { text-align: left; }
-        .behavior-header { background: #003366; color: white; padding: 6px; font-weight: bold; text-align: left; border: 2px solid #000; border-bottom: none; font-size: 13px;}
-
-        /* Comments Box */
-        .comments-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .comments-table td {
-            border: 2px solid #000;
-            padding: 10px;
-        }
-        .comments-table td.label {
-            font-weight: bold;
-            width: 25%;
-            font-size: 14px;
+        .behavior-header {
+            background: #003366; color: white;
+            padding: 6px; font-weight: bold; text-align: left;
+            border: 2px solid #000; border-bottom: none; font-size: 13px;
         }
 
-        /* Loading / Empty States */
+        /* ── Comments ── */
+        .comments-table { width: 100%; border-collapse: collapse; }
+        .comments-table td { border: 2px solid #000; padding: 10px; font-size: 13px; vertical-align: top; }
+        .comments-table td.label { font-weight: bold; width: 28%; }
+
+        /* ── Loading / Empty ── */
         #loadingState, #emptyState { text-align: center; padding: 40px; font-size: 18px; color: #666; display: none; }
 
+        /* ── PRINT ── */
         @media print {
             body { background: #fff; padding: 0; }
             .no-print { display: none !important; }
-            .report-container { box-shadow: none; padding: 0; width: 100%; }
+            .report-container { box-shadow: none; padding: 10px; width: 100%; }
+            .table-scroll, .behavior-scroll { overflow: visible; }
+            .data-table, .behavior-table { min-width: unset; }
+            .behavior-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        /* ── MOBILE ≤ 600px ── */
+        @media (max-width: 600px) {
+            body { padding: 8px; }
+            .report-container { padding: 14px; }
+
+            /* Controls stack into two columns of buttons */
+            .controls { flex-direction: column; align-items: stretch; gap: 10px; }
+            .controls > .ctrl-right { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+            .controls .btn, .controls .term-selector { width: 100%; text-align: center; padding: 10px 8px; }
+
+            /* Header stacks vertically */
+            .header { flex-direction: column; align-items: center; text-align: center; gap: 10px; }
+            .header-center h1 { font-size: 15px; letter-spacing: 1px; }
+            .header-center h2 { font-size: 11px; }
+            .header-center h3 { font-size: 10px; }
+            .img-placeholder { width: 65px; height: 80px; font-size: 9px; }
+            .logo-placeholder { width: 65px; height: 65px; }
+
+            /* Info and summary: single column */
+            .info-grid, .summary-grid { grid-template-columns: 1fr; gap: 10px; }
+            .info-table td { font-size: 12px; }
+
+            /* Behavior tables: single column */
+            .behavior-grid { grid-template-columns: 1fr; gap: 14px; }
+
+            /* Comments: stack label above value */
+            .comments-table, .comments-table tbody,
+            .comments-table tr { display: block; width: 100%; }
+            .comments-table td { display: block; width: 100%; }
+            .comments-table td.label { border-bottom: none; padding-bottom: 2px; background: #f3f4f6; width: 100%; }
+            .comments-table td:not(.label) { border-top: none; padding-top: 6px; }
+
+            .section-header { font-size: 12px; }
+        }
+
+        /* ── TABLET 601–768px ── */
+        @media (min-width: 601px) and (max-width: 768px) {
+            .report-container { padding: 24px; }
+            .header-center h1 { font-size: 18px; }
+            .img-placeholder { width: 80px; height: 95px; }
+            .logo-placeholder { width: 80px; height: 80px; }
+            .info-table td, .data-table { font-size: 12px; }
         }
     </style>
 </head>
 <body>
 
     <div class="report-container">
-        <!-- Controls (Hidden on Print) -->
+
+        <!-- Controls (hidden on print) -->
         <div class="controls no-print">
-            <button onclick="window.history.back()" class="btn" style="background:#e5e7eb; color:#374151;">&larr; Back</button>
-            <div>
+            <button onclick="window.history.back()" class="btn btn-back">&larr; Back</button>
+            <div class="ctrl-right">
                 <select id="termSelector" class="term-selector">
                     <option value="First Term">First Term</option>
                     <option value="Second Term">Second Term</option>
                     <option value="Third Term">Third Term</option>
                 </select>
-                <button onclick="window.print()" class="btn btn-print">🖨️ Print Report</button>
+                <button onclick="window.print()" class="btn btn-print">&#128424; Print</button>
                 <button onclick="logout()" class="btn btn-logout">Logout</button>
             </div>
         </div>
@@ -152,7 +190,8 @@
         <div id="loadingState">Loading your results...</div>
         <div id="emptyState">No results found for this term.</div>
 
-        <div id="reportContent" style="display: none;">
+        <div id="reportContent" style="display:none;">
+
             <!-- Header -->
             <div class="header">
                 <div class="img-placeholder">STUDENT<br>PHOTO</div>
@@ -187,7 +226,7 @@
             <!-- Summary Block -->
             <div class="summary-grid">
                 <div>
-                    <table class="info-table" style="font-weight: bold;">
+                    <table class="info-table" style="font-weight:bold;">
                         <tr><td style="border-top:2px solid #000;">Total Score:</td><td style="border-top:2px solid #000;" id="lblTotalScore">--</td></tr>
                         <tr><td>1st Term Ave:</td><td id="lbl1stTermAve">--</td></tr>
                         <tr><td>2nd Term Ave:</td><td id="lbl2ndTermAve">--</td></tr>
@@ -196,39 +235,39 @@
                     </table>
                 </div>
                 <div style="display:flex; align-items:flex-end; padding-bottom:10px;">
-                    <div style="border:2px solid #000; padding:10px; font-weight:bold; font-size:14px; width:100%; text-align:center;">
+                    <div style="border:2px solid #000; padding:12px; font-weight:bold; font-size:14px; width:100%; text-align:center;">
                         CLASS AVERAGE: <span id="lblClassAverage">--</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Cognitive Domain Table -->
+            <!-- Cognitive Domain -->
             <div class="section-header">COGNITIVE DOMAIN</div>
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th rowspan="2">SUBJECTS</th>
-                        <th>TEST</th>
-                        <th>EXAMS</th>
-                        <th>TOTAL</th>
-                        <th rowspan="2">GRADE</th>
-                        <th rowspan="2">COMMENT</th>
-                    </tr>
-                    <tr>
-                        <th style="font-size:10px;">30%</th>
-                        <th style="font-size:10px;">70%</th>
-                        <th style="font-size:10px;">100%</th>
-                    </tr>
-                </thead>
-                <tbody id="cognitiveBody">
-                    <!-- Injected via JS -->
-                </tbody>
-            </table>
+            <div class="table-scroll">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">SUBJECTS</th>
+                            <th>TEST</th>
+                            <th>EXAMS</th>
+                            <th>TOTAL</th>
+                            <th rowspan="2">GRADE</th>
+                            <th rowspan="2">COMMENT</th>
+                        </tr>
+                        <tr>
+                            <th style="font-size:10px;">30%</th>
+                            <th style="font-size:10px;">70%</th>
+                            <th style="font-size:10px;">100%</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cognitiveBody"></tbody>
+                </table>
+            </div>
 
             <!-- Scale Reference -->
-            <div style="font-size: 11px; margin-bottom: 5px; color: #333;">
-                <strong>SCALE:</strong> Excellent (5), Very Good (4), Good (3), Fair (2), Poor (1) | 
-                <strong>GRADE DETAILS:</strong> A=80-100 (Excellent), B=70-79 (Very Good), C=60-69 (Good), D=50-59 (Fair), E=40-49 (Poor), F=0-39 (Very Poor)
+            <div style="font-size:11px; margin-bottom:14px; color:#333; line-height:1.6;">
+                <strong>SCALE:</strong> Excellent (5), Very Good (4), Good (3), Fair (2), Poor (1) |
+                <strong>GRADE:</strong> A=80-100, B=70-79, C=60-69, D=50-59, E=40-49, F=0-39
             </div>
 
             <!-- Behavioral Domains -->
@@ -236,33 +275,33 @@
                 <!-- Affective -->
                 <div>
                     <div class="behavior-header">Assessment of Affective Domain</div>
-                    <table class="behavior-table">
-                        <thead>
-                            <tr>
-                                <th>Rating Key</th>
-                                <th>5</th><th>4</th><th>3</th><th>2</th><th>1</th>
-                            </tr>
-                        </thead>
-                        <tbody id="affectiveBody">
-                            <!-- Injected via JS -->
-                        </tbody>
-                    </table>
+                    <div class="behavior-scroll">
+                        <table class="behavior-table">
+                            <thead>
+                                <tr>
+                                    <th>Rating Key</th>
+                                    <th>5</th><th>4</th><th>3</th><th>2</th><th>1</th>
+                                </tr>
+                            </thead>
+                            <tbody id="affectiveBody"></tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Psychomotor -->
                 <div>
                     <div class="behavior-header">Psychomotor Assessment:</div>
-                    <table class="behavior-table">
-                        <thead>
-                            <tr>
-                                <th></th> <!-- Empty for trait name -->
-                                <th>5</th><th>4</th><th>3</th><th>2</th><th>1</th>
-                            </tr>
-                        </thead>
-                        <tbody id="psychomotorBody">
-                            <!-- Injected via JS -->
-                        </tbody>
-                    </table>
+                    <div class="behavior-scroll">
+                        <table class="behavior-table">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>5</th><th>4</th><th>3</th><th>2</th><th>1</th>
+                                </tr>
+                            </thead>
+                            <tbody id="psychomotorBody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -270,11 +309,11 @@
             <table class="comments-table">
                 <tr>
                     <td class="label">CLASS TEACHER'S COMMENT:</td>
-                    <td id="lblTeacherComment" style="font-style: italic;">--</td>
+                    <td id="lblTeacherComment" style="font-style:italic;">--</td>
                 </tr>
                 <tr>
                     <td class="label">PRINCIPAL'S COMMENT:</td>
-                    <td id="lblPrincipalComment" style="font-style: italic;">--</td>
+                    <td id="lblPrincipalComment" style="font-style:italic;">--</td>
                 </tr>
             </table>
 
