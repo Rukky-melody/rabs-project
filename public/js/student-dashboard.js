@@ -66,10 +66,9 @@ async function fetchResults(term = 'First Term') {
             
             document.getElementById('lblSurname').innerText = surname.toUpperCase();
             document.getElementById('lblOtherNames').innerText = otherNames.toUpperCase();
-            document.getElementById('lblClass').innerText = studentClass;
-            document.getElementById('lblSex').innerText = 'N/A'; // Assuming not in DB
+            document.getElementById('lblClass').innerText = termMetadata.class_name || studentClass || '--';
+            document.getElementById('lblSex').innerText = termMetadata.sex || '--';
             
-            document.getElementById('lblNoInClass').innerText = 'N/A';
             document.getElementById('lblSchoolOpened').innerText = termMetadata.times_school_opened || '--';
             document.getElementById('lblDaysPresent').innerText = termMetadata.days_present || '--';
             document.getElementById('lblDaysAbsent').innerText = termMetadata.days_absent || '--';

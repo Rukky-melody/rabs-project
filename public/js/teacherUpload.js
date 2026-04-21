@@ -69,6 +69,8 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
     
     const studentId = document.getElementById('studentId').value;
     const studentFullName = document.getElementById('studentFullName').value;
+    const studentSex = document.getElementById('studentSex').value;
+    const studentClass = document.getElementById('studentClass').value;
     const term = document.getElementById('term').value;
     
     const rows = document.querySelectorAll('#subjectsBody tr');
@@ -120,6 +122,8 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
     });
 
     const metadata = {
+        sex: studentSex,
+        studentClass: studentClass,
         session: document.getElementById('session').value || '',
         timesSchoolOpened: parseInt(document.getElementById('timesSchoolOpened').value) || 0,
         daysPresent: parseInt(document.getElementById('daysPresent').value) || 0,

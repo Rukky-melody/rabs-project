@@ -21,7 +21,7 @@
         const btn = document.getElementById('themeToggleBtn');
         if (!btn) return;
         const isDark = getTheme() === 'dark';
-        btn.textContent = isDark ? '☀️' : '🌙';
+        btn.innerHTML = isDark ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
         btn.title = isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode';
     }
 

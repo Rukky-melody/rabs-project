@@ -21,6 +21,7 @@ exports.uploadScore = async (req, res) => {
         // Handle Metadata
         if (metadata) {
             const {
+                sex, studentClass,
                 session, timesSchoolOpened, daysPresent, daysAbsent,
                 teacherComment, principalComment, affectiveTraits, psychomotorTraits
             } = metadata;
@@ -34,17 +35,18 @@ exports.uploadScore = async (req, res) => {
             if (existingMeta.length > 0) {
                 await db.query(
                     `UPDATE report_metadata SET 
+                        sex = ?, class_name = ?,
                         session = ?, times_school_opened = ?, days_present = ?, days_absent = ?, 
                         teacher_comment = ?, principal_comment = ?, affective_traits = ?, psychomotor_traits = ?
                     WHERE id = ?`,
-                    [session, timesSchoolOpened, daysPresent, daysAbsent, teacherComment, principalComment, JSON.stringify(affectiveTraits), JSON.stringify(psychomotorTraits), existingMeta[0].id]
+                    [sex || null, studentClass || null, session, timesSchoolOpened, daysPresent, daysAbsent, teacherComment, principalComment, JSON.stringify(affectiveTraits), JSON.stringify(psychomotorTraits), existingMeta[0].id]
                 );
             } else {
                 await db.query(
                     `INSERT INTO report_metadata 
-                        (student_id, term, session, times_school_opened, days_present, days_absent, teacher_comment, principal_comment, affective_traits, psychomotor_traits) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                    [studentId, term, session, timesSchoolOpened, daysPresent, daysAbsent, teacherComment, principalComment, JSON.stringify(affectiveTraits), JSON.stringify(psychomotorTraits)]
+                        (student_id, term, sex, class_name, session, times_school_opened, days_present, days_absent, teacher_comment, principal_comment, affective_traits, psychomotor_traits) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                    [studentId, term, sex || null, studentClass || null, session, timesSchoolOpened, daysPresent, daysAbsent, teacherComment, principalComment, JSON.stringify(affectiveTraits), JSON.stringify(psychomotorTraits)]
                 );
             }
         }
