@@ -22,7 +22,12 @@ exports.loginStaff = async (req, res) => {
         const [rows] = await db.query('SELECT * FROM staff WHERE staff_id = ? AND password = ?', [staffId, password]);
         
         if (rows.length > 0) {
-            res.status(200).json({ success: true, role: rows[0].role });
+            res.status(200).json({ 
+                success: true, 
+                role: rows[0].role,
+                staffName: rows[0].staff_name,
+                staffId: rows[0].staff_id
+            });
         } else {
             res.status(401).json({ success: false, message: "Invalid ID or Password" });
         }

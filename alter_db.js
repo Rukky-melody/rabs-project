@@ -48,6 +48,22 @@ async function alterTable() {
         if (e.code === 'ER_DUP_FIELDNAME') console.log('staff_name already exists in staff');
         else console.error('Error adding staff_name:', e);
     }
+
+    try {
+        await db.query("ALTER TABLE report_metadata ADD COLUMN uploaded_by VARCHAR(255)");
+        console.log('Added uploaded_by column to report_metadata');
+    } catch (e) {
+        if (e.code === 'ER_DUP_FIELDNAME') console.log('uploaded_by already exists in report_metadata');
+        else console.error('Error adding uploaded_by:', e);
+    }
+
+    try {
+        await db.query("ALTER TABLE report_metadata ADD COLUMN uploaded_by_id VARCHAR(255)");
+        console.log('Added uploaded_by_id column to report_metadata');
+    } catch (e) {
+        if (e.code === 'ER_DUP_FIELDNAME') console.log('uploaded_by_id already exists in report_metadata');
+        else console.error('Error adding uploaded_by_id:', e);
+    }
     
     process.exit(0);
 }

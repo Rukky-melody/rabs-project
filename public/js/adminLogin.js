@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (data.role === 'admin') {
                         localStorage.setItem('currentStaffId', data.staffId);
                         localStorage.setItem('staffRole', data.role);
+                        localStorage.setItem('staffName', data.staffName || 'Admin');
                         window.location.href = 'reg.html';
                     } else {
                         alert("Access Denied: You do not have Administrative privileges.");

@@ -1,9 +1,17 @@
 // Gatekeeper: Redirect if no Staff ID is found
-if (!localStorage.getItem('currentStaffId')) {
+const currentStaffId = localStorage.getItem('currentStaffId');
+const currentStaffName = localStorage.getItem('staffName') || 'Teacher';
+
+if (!currentStaffId) {
     window.location.href = 'login.html';
 }
 
-// ... rest of your upload logic
+document.addEventListener('DOMContentLoaded', () => {
+    const welcomeEl = document.getElementById('teacherWelcome');
+    if (welcomeEl) {
+        welcomeEl.innerHTML = `Logged in as: <strong>${currentStaffName}</strong> (${currentStaffId})`;
+    }
+});
 
 // Spreadsheet table management
 const defaultSubjects = ["Mathematics", "English Language", "Civic Education", "Biology", "Chemistry"];
@@ -130,6 +138,8 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
         daysAbsent: parseInt(document.getElementById('daysAbsent').value) || 0,
         teacherComment: document.getElementById('teacherComment').value || '',
         principalComment: document.getElementById('principalComment').value || '',
+        uploadedBy: currentStaffName,
+        uploadedById: currentStaffId,
         affectiveTraits: affectiveResults,
         psychomotorTraits: psychomotorResults
     };

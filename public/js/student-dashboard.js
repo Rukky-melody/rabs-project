@@ -186,6 +186,7 @@ async function fetchResults(term = 'First Term') {
 
             // --- Comments ---
             document.getElementById('lblTeacherComment').innerText = termMetadata.teacher_comment || '--';
+            document.getElementById('lblTeacherName').innerText = termMetadata.uploaded_by || '--';
             document.getElementById('lblPrincipalComment').innerText = termMetadata.principal_comment || '--';
 
             reportContent.style.display = 'block';

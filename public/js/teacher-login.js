@@ -12,6 +12,7 @@ document.getElementById('teacherLoginForm').addEventListener('submit', async (e)
             const data = await response.json();
             if (data.success && data.role === 'teacher') {
                 localStorage.setItem('currentStaffId', staffId);
+                localStorage.setItem('staffName', data.staffName || 'Teacher');
                 window.location.href = 'upload.html';
             } else {
                 alert("Invalid Credentials or Access Level");
