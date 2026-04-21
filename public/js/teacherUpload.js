@@ -49,7 +49,7 @@ function createRow(subject = "") {
             <input type="number" class="exam-input" placeholder="0-70" min="0" max="70" style="width: 100%; border: 1px solid var(--border); padding: 8px; border-radius: 4px; background: transparent; color: var(--text);">
         </td>
         <td style="padding: 10px; text-align: center;">
-            <button type="button" class="remove-row-btn" style="color: var(--error); background: transparent; border: none; cursor: pointer; font-size: 1.2rem; outline: none;">&times;</button>
+            <button type="button" class="remove-row-btn" style="color: var(--error); background: transparent; border: none; cursor: pointer; font-size: 1.1rem; outline: none;"><i class="fa-solid fa-delete-left"></i></button>
         </td>
     `;
     
@@ -191,7 +191,7 @@ async function loadResults() {
             <td style="padding:10px;">${row.exam_score}</td>
             <td style="padding:10px;"><strong>${total}</strong></td>
             <td style="padding:10px; text-align:center;">
-                <button data-id="${row.id}" class="delete-row-btn" style="color:var(--error); background:transparent; border:none; cursor:pointer; font-size:1.2rem;">🗑️</button>
+                <button data-id="${row.id}" class="delete-row-btn" style="color:var(--error); background:transparent; border:none; cursor:pointer; font-size:1.1rem;"><i class="fa-solid fa-delete-left"></i></button>
             </td>
         `;
         tr.querySelector('.delete-row-btn').addEventListener('click', async () => {
