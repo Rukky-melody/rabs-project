@@ -40,6 +40,14 @@ async function alterTable() {
         if (e.code === 'ER_DUP_FIELDNAME') console.log('photo_url already exists in students');
         else console.error('Error adding photo_url:', e);
     }
+
+    try {
+        await db.query("ALTER TABLE staff ADD COLUMN staff_name VARCHAR(255)");
+        console.log('Added staff_name column to staff');
+    } catch (e) {
+        if (e.code === 'ER_DUP_FIELDNAME') console.log('staff_name already exists in staff');
+        else console.error('Error adding staff_name:', e);
+    }
     
     process.exit(0);
 }

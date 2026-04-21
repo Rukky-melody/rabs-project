@@ -2,11 +2,11 @@ const db = require('../config/db');
 
 // ADMIN ACTION: Registering Teachers/Staff
 exports.registerStaff = async (req, res) => {
-    const { staffId, password, role } = req.body;
+    const { staffId, password, role, staffName } = req.body;
 
     try {
-        const query = 'INSERT INTO staff (staff_id, password, role) VALUES (?, ?, ?)';
-        await db.query(query, [staffId, password, role]);
+        const query = 'INSERT INTO staff (staff_id, password, role, staff_name) VALUES (?, ?, ?, ?)';
+        await db.query(query, [staffId, password, role, staffName]);
         
         res.status(201).json({ success: true, message: "Staff account created successfully." });
     } catch (error) {

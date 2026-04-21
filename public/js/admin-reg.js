@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = true;
 
             const payload = {
+                staffName: document.getElementById('staffName').value.trim(),
                 staffId:  document.getElementById('staffId').value.trim(),
                 password: document.getElementById('password').value,
                 role:     document.getElementById('role').value
