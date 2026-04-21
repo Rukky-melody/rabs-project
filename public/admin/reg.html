@@ -1,23 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <title>Admin - Staff Registration</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Staff — RABS Admin</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <h2>Register New Staff</h2>
-        <form id="adminRegForm">
-            <input type="text" id="staffId" placeholder="Assign Staff ID" required>
-            <input type="password" id="password" placeholder="Set Password" required>
-            <select id="role">
-                <option value="teacher">Teacher</option>
-                <option value="admin">Admin</option>
-            </select>
-            <button type="submit">Create Account</button>
-        </form>
+    <div class="auth-page">
+        <div class="auth-card">
+
+            <!-- Header -->
+            <div class="auth-header">
+                <div class="auth-icon">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <h1>Register New Staff</h1>
+                <p>Create login credentials for a teacher or admin</p>
+            </div>
+
+            <!-- Alert Message Area -->
+            <div id="regMsg"></div>
+
+            <!-- Form -->
+            <form id="adminRegForm" class="auth-form">
+
+                <div class="form-group">
+                    <label for="staffId">
+                        <i class="fa-solid fa-id-badge" style="margin-right:6px; color:var(--primary-light);"></i>Staff ID
+                    </label>
+                    <input type="text" id="staffId" placeholder="e.g. TCH-2026-01" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fa-solid fa-lock" style="margin-right:6px; color:var(--primary-light);"></i>Password
+                    </label>
+                    <input type="password" id="password" placeholder="Set a secure password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="role">
+                        <i class="fa-solid fa-user-gear" style="margin-right:6px; color:var(--primary-light);"></i>Role
+                    </label>
+                    <select id="role" required>
+                        <option value="teacher">Teacher</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn btn-primary btn-full" style="margin-top:8px;">
+                    <i class="fa-solid fa-user-plus"></i> Create Account
+                </button>
+            </form>
+
+            <!-- Footer nav -->
+            <p class="auth-footer">
+                <a href="login.html"><i class="fa-solid fa-arrow-left" style="margin-right:4px;"></i>Back to Admin Login</a>
+            </p>
+
+        </div>
     </div>
+
+    <script src="../js/theme.js"></script>
     <script src="../js/admin-reg.js"></script>
 </body>
 </html>
