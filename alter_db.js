@@ -32,6 +32,14 @@ async function alterTable() {
         if (e.code === 'ER_DUP_FIELDNAME') console.log('class_name already exists in report_metadata');
         else console.error('Error adding class_name:', e);
     }
+
+    try {
+        await db.query("ALTER TABLE students ADD COLUMN photo_url VARCHAR(500)");
+        console.log('Added photo_url column to students');
+    } catch (e) {
+        if (e.code === 'ER_DUP_FIELDNAME') console.log('photo_url already exists in students');
+        else console.error('Error adding photo_url:', e);
+    }
     
     process.exit(0);
 }

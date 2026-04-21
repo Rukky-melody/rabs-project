@@ -2,6 +2,7 @@
 const studentId   = localStorage.getItem('currentStudentId');
 const studentName = localStorage.getItem('studentName');
 const studentClass = localStorage.getItem('studentClass') || 'N/A';
+const studentPhoto = localStorage.getItem('studentPhoto') || '';
 
 if (!studentId) {
     window.location.href = 'login.html';
@@ -12,6 +13,56 @@ const drawerNameEl = document.getElementById('drawerName');
 const drawerIdEl   = document.getElementById('drawerId');
 if (drawerNameEl) drawerNameEl.textContent = studentName || 'Student';
 if (drawerIdEl)   drawerIdEl.textContent   = studentId || '';
+
+// ── Photo display ──
+function applyPhoto(url) {
+    const drawerPhoto = document.getElementById('drawerPhoto');
+    const reportPhoto = document.getElementById('reportPhoto');
+    if (url) {
+        if (drawerPhoto) drawerPhoto.innerHTML = `<img src="${url}" alt="Student Photo">`;
+        if (reportPhoto) reportPhoto.innerHTML = `<img src="${url}" alt="Student Photo" style="width:100%;height:100%;object-fit:cover;">`;
+    } else {
+        // No photo — show upload button in drawer
+        const uploadBtn = document.getElementById('drawerUploadBtn');
+        if (uploadBtn) uploadBtn.style.display = 'flex';
+    }
+}
+applyPhoto(studentPhoto);
+
+// ── One-time upload for existing users ──
+const drawerPhotoInput = document.getElementById('drawerPhotoInput');
+if (drawerPhotoInput) {
+    drawerPhotoInput.addEventListener('change', async () => {
+        const file = drawerPhotoInput.files[0];
+        if (!file) return;
+
+        const uploadBtn = document.getElementById('drawerUploadBtn');
+        uploadBtn.textContent = 'Uploading...';
+        uploadBtn.disabled = true;
+
+        const formData = new FormData();
+        formData.append('photo', file);
+        formData.append('studentId', studentId);
+
+        try {
+            const res = await fetch('/api/student/upload-photo', { method: 'POST', body: formData });
+            const data = await res.json();
+            if (data.success) {
+                localStorage.setItem('studentPhoto', data.photoUrl);
+                applyPhoto(data.photoUrl);
+                uploadBtn.style.display = 'none';
+            } else {
+                alert(data.message);
+                uploadBtn.innerHTML = '<i class="fa-solid fa-camera"></i> Upload Photo';
+                uploadBtn.disabled = false;
+            }
+        } catch (err) {
+            alert('Upload failed. Please try again.');
+            uploadBtn.innerHTML = '<i class="fa-solid fa-camera"></i> Upload Photo';
+            uploadBtn.disabled = false;
+        }
+    });
+}
 
 const affectiveTraitsList = ["Honesty", "Cleanliness", "Punctuality", "Attentiveness", "Carefulness", "Considerate", "Politeness", "Obedience", "Promptness"];
 const psychomotorTraitsList = ["Track Events", "Field Events", "Sings Alone", "Dance to beat", "Drawing and Painting"];

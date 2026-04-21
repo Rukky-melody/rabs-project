@@ -6,6 +6,38 @@
     <title>Student Registration — RABS</title>
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .photo-upload-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 10px;
+        }
+        .photo-preview {
+            width: 100px;
+            height: 120px;
+            border-radius: 6px;
+            border: 2px dashed var(--border);
+            object-fit: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: var(--bg-card);
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .photo-preview:hover { border-color: var(--primary); }
+        .photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-preview .placeholder-icon { font-size: 2rem; color: var(--text-muted); }
+        .photo-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+        #photoInput { display: none; }
+    </style>
 </head>
 <body>
     <div class="auth-page">
@@ -19,7 +51,17 @@
                     <p>Enter your details to generate your unique Student ID</p>
                 </div>
 
-                <form id="regForm" class="auth-form">
+                <form id="regForm" class="auth-form" enctype="multipart/form-data">
+
+                    <!-- Photo Upload -->
+                    <div class="photo-upload-wrapper">
+                        <div class="photo-preview" id="photoPreview" onclick="document.getElementById('photoInput').click()" title="Click to upload photo">
+                            <span class="placeholder-icon"><i class="fa-solid fa-camera"></i></span>
+                        </div>
+                        <input type="file" id="photoInput" name="photo" accept="image/*">
+                        <span class="photo-label">Profile photo <em>(optional — tap to upload)</em></span>
+                    </div>
+
                     <div class="form-group">
                         <label for="name">Full Name</label>
                         <input type="text" id="name" placeholder="Enter your full name" required>

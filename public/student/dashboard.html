@@ -105,7 +105,29 @@
             color: #9ca3af;
             font-size: 12px;
             text-align: center;
+            overflow: hidden;
+            position: relative;
         }
+        .drawer-photo img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .drawer-upload-btn {
+            background: #003366;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            font-size: 11px;
+            cursor: pointer;
+            width: calc(100% - 32px);
+            margin: 0 16px 16px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .drawer-upload-btn:hover { background: #00509e; }
+        #drawerPhotoInput { display: none; }
 
         .drawer-name {
             text-align: center;
@@ -281,7 +303,11 @@
     <!-- Side Drawer -->
     <div class="drawer no-print" id="drawer">
         <div class="drawer-header">&#128100; My Profile</div>
-        <div class="drawer-photo">STUDENT<br>PHOTO</div>
+        <div class="drawer-photo" id="drawerPhoto">STUDENT<br>PHOTO</div>
+        <input type="file" id="drawerPhotoInput" accept="image/*">
+        <button class="drawer-upload-btn no-print" id="drawerUploadBtn" style="display:none;" onclick="document.getElementById('drawerPhotoInput').click()">
+            <i class="fa-solid fa-camera"></i> Upload Photo
+        </button>
         <div class="drawer-name" id="drawerName">Loading...</div>
         <div class="drawer-id" id="drawerId"></div>
         <div class="drawer-divider"></div>
@@ -316,7 +342,7 @@
 
             <!-- Report Header -->
             <div class="header">
-                <div class="img-placeholder">SCHOOL<br>LOGO</div>
+                <div class="img-placeholder" id="reportPhoto">STUDENT<br>PHOTO</div>
                 <div class="header-center">
                     <h1>RUKKYS<br>MODERN ACADEMY</h1>
                     <h2>Academic Report Sheet: <span id="displayTerm">--</span> <span id="displaySession">--</span></h2>
