@@ -66,8 +66,9 @@
                         <thead>
                             <tr style="border-bottom: 1px solid var(--border); text-align: left;">
                                 <th style="padding: 10px;">Subject</th>
-                                <th style="padding: 10px; width: 150px;">Test (Max 30)</th>
-                                <th style="padding: 10px; width: 150px;">Exam (Max 70)</th>
+                                <th style="padding: 10px; width: 120px;">Test (30)</th>
+                                <th style="padding: 10px; width: 120px;">Exam (70)</th>
+                                <th style="padding: 10px; width: 100px;">Total</th>
                                 <th style="padding: 10px; width: 80px;">Action</th>
                             </tr>
                         </thead>
@@ -75,6 +76,9 @@
                             <!-- Predefined Subjects injected by JS -->
                         </tbody>
                     </table>
+                    <div id="averageDisplay" style="margin-bottom: 1rem; text-align: right; font-size: 1.1rem; color: var(--text);">
+                        Term Average: <strong id="termAverage">0.00%</strong>
+                    </div>
                     <button type="button" id="addRowBtn" style="background: transparent; border: 1px dashed var(--border); color: var(--text-muted); padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; text-align: center;">+ Add Extra Subject</button>
                 </div>
 

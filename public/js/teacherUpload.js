@@ -44,6 +44,29 @@ function renderTraits(containerId, traits) {
 renderTraits('affectiveTraitsContainer', affectiveTraits);
 renderTraits('psychomotorTraitsContainer', psychomotorTraits);
 
+function calculateTermAverage() {
+    const rows = document.querySelectorAll('#subjectsBody tr');
+    let totalSum = 0;
+    let count = 0;
+    
+    rows.forEach(row => {
+        const ca = parseFloat(row.querySelector('.ca-input').value) || 0;
+        const exam = parseFloat(row.querySelector('.exam-input').value) || 0;
+        const total = ca + exam;
+        const totalEl = row.querySelector('.total-score-display');
+        if (totalEl) totalEl.textContent = total;
+        
+        if (ca > 0 || exam > 0) {
+            totalSum += total;
+            count++;
+        }
+    });
+    
+    const avg = count > 0 ? (totalSum / count).toFixed(2) : "0.00";
+    const termAvgEl = document.getElementById('termAverage');
+    if (termAvgEl) termAvgEl.textContent = avg + "%";
+}
+
 function createRow(subject = "") {
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -56,17 +79,28 @@ function createRow(subject = "") {
         <td style="padding: 10px;">
             <input type="number" class="exam-input" placeholder="0-70" min="0" max="70" style="width: 100%; border: 1px solid var(--border); padding: 8px; border-radius: 4px; background: transparent; color: var(--text);">
         </td>
+        <td style="padding: 10px;">
+            <strong class="total-score-display">0</strong>
+        </td>
         <td style="padding: 10px; text-align: center;">
             <button type="button" class="remove-row-btn" style="color: var(--error); background: transparent; border: none; cursor: pointer; font-size: 1.1rem; outline: none;"><i class="fa-solid fa-delete-left"></i></button>
         </td>
     `;
     
-    tr.querySelector('.remove-row-btn').addEventListener('click', () => tr.remove());
+    tr.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', calculateTermAverage);
+    });
+
+    tr.querySelector('.remove-row-btn').addEventListener('click', () => {
+        tr.remove();
+        calculateTermAverage();
+    });
     return tr;
 }
 
 if (tbody) {
     defaultSubjects.forEach(sub => tbody.appendChild(createRow(sub)));
+    calculateTermAverage();
     document.getElementById('addRowBtn').addEventListener('click', () => {
         tbody.appendChild(createRow(""));
     });
@@ -191,8 +225,10 @@ async function loadResults() {
     showManageMsg(`Loaded ${data.results.length} result(s) for ${term}.`);
     tbody.innerHTML = '';
 
+    let totalSum = 0;
     data.results.forEach(row => {
         const total = parseFloat(row.ca_score) + parseFloat(row.exam_score);
+        totalSum += total;
         const tr = document.createElement('tr');
         tr.style.borderBottom = '1px solid var(--border)';
         tr.innerHTML = `
@@ -208,11 +244,30 @@ async function loadResults() {
             if (!confirm(`Delete "${row.subject}" from ${term}?`)) return;
             const delRes = await fetch(`/api/staff/result/${row.id}`, { method: 'DELETE' });
             const delData = await delRes.json();
-            if (delData.success) { tr.remove(); showManageMsg(`"${row.subject}" deleted.`); }
+            if (delData.success) { 
+                tr.remove(); 
+                showManageMsg(`"${row.subject}" deleted.`);
+                // Refresh average after delete
+                loadResults(); 
+            }
             else showManageMsg(delData.message, true);
         });
         tbody.appendChild(tr);
     });
+
+    if (data.results.length > 0) {
+        const average = (totalSum / data.results.length).toFixed(2);
+        const avgTr = document.createElement('tr');
+        avgTr.style.background = 'rgba(255, 255, 255, 0.03)';
+        avgTr.innerHTML = `
+            <td style="padding:15px; font-weight:bold; color:var(--text);">TERM AVERAGE</td>
+            <td></td>
+            <td></td>
+            <td style="padding:15px; font-size:1.1rem; color:var(--success, #22c55e);"><strong>${average}%</strong></td>
+            <td></td>
+        `;
+        tbody.appendChild(avgTr);
+    }
 
     container.style.display = 'block';
 }
