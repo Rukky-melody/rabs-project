@@ -371,84 +371,8 @@
                 </div>
             </div>
 
-            <!-- Summary Block -->
-            <div class="summary-grid">
-                <div>
-                    <table class="info-table" style="font-weight:bold;">
-                        <tr><td style="border-top:2px solid #000;">Total Score:</td><td style="border-top:2px solid #000;" id="lblTotalScore">--</td></tr>
-                        <tr><td>1st Term Ave:</td><td id="lbl1stTermAve">--</td></tr>
-                        <tr><td>2nd Term Ave:</td><td id="lbl2ndTermAve">--</td></tr>
-                        <tr><td>3rd Term Ave:</td><td id="lbl3rdTermAve">--</td></tr>
-                        <tr><td>Grade:</td><td id="lblOverallGrade">--</td></tr>
-                    </table>
-                </div>
-                <div style="display:flex; align-items:flex-end; padding-bottom:10px;">
-                    <div style="border:2px solid #000; padding:12px; font-weight:bold; font-size:14px; width:100%; text-align:center;">
-                        CLASS AVERAGE: <span id="lblClassAverage">--</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Cognitive Domain -->
-            <div class="section-header">COGNITIVE DOMAIN</div>
-            <div class="table-scroll">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th rowspan="2">SUBJECTS</th>
-                            <th>TEST</th>
-                            <th>EXAMS</th>
-                            <th>TOTAL</th>
-                            <th rowspan="2">GRADE</th>
-                            <th rowspan="2">COMMENT</th>
-                        </tr>
-                        <tr>
-                            <th style="font-size:10px;">30%</th>
-                            <th style="font-size:10px;">70%</th>
-                            <th style="font-size:10px;">100%</th>
-                        </tr>
-                    </thead>
-                    <tbody id="cognitiveBody"></tbody>
-                </table>
-            </div>
-
-            <!-- Scale Reference -->
-            <div style="font-size:11px; margin-bottom:14px; color:#333; line-height:1.6;">
-                <strong>SCALE:</strong> Excellent (5), Very Good (4), Good (3), Fair (2), Poor (1) |
-                <strong>GRADE:</strong> A=80-100, B=70-79, C=60-69, D=50-59, E=40-49, F=0-39
-            </div>
-
-            <!-- Behavioral Domains -->
-            <div class="behavior-grid">
-                <div>
-                    <div class="behavior-header">Assessment of Affective Domain</div>
-                    <div class="behavior-scroll">
-                        <table class="behavior-table">
-                            <thead>
-                                <tr>
-                                    <th>Rating Key</th>
-                                    <th>5</th><th>4</th><th>3</th><th>2</th><th>1</th>
-                                </tr>
-                            </thead>
-                            <tbody id="affectiveBody"></tbody>
-                        </table>
-                    </div>
-                </div>
-                <div>
-                    <div class="behavior-header">Psychomotor Assessment:</div>
-                    <div class="behavior-scroll">
-                        <table class="behavior-table">
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    <th>5</th><th>4</th><th>3</th><th>2</th><th>1</th>
-                                </tr>
-                            </thead>
-                            <tbody id="psychomotorBody"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+            <!-- Dynamic Report Container (Injected by JS) -->
+            <div id="dynamicReportContainer"></div>
 
             <!-- Comments -->
             <table class="comments-table">
