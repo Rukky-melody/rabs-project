@@ -69,10 +69,10 @@ exports.uploadScore = async (req, res) => {
                 if (existing.length > 0) {
                     await db.query(
                         'UPDATE results SET ca_score = ?, first_test = ?, second_test = ?, exam_score = ? WHERE id = ?',
-                        [score.caScore || null, score.firstTest || null, score.secondTest || null, score.examScore || null, existing[0].id]
+                        [score.caScore || 0, score.firstTest || 0, score.secondTest || 0, score.examScore || 0, existing[0].id]
                     );
                 } else {
-                    await db.query(query, [studentId, studentFullName, score.subject, score.caScore || null, score.firstTest || null, score.secondTest || null, score.examScore || null, term]);
+                    await db.query(query, [studentId, studentFullName, score.subject, score.caScore || 0, score.firstTest || 0, score.secondTest || 0, score.examScore || 0, term]);
                 }
             }
         } else if (subject) {
@@ -85,10 +85,10 @@ exports.uploadScore = async (req, res) => {
             if (existing.length > 0) {
                 await db.query(
                     'UPDATE results SET ca_score = ?, first_test = ?, second_test = ?, exam_score = ? WHERE id = ?',
-                    [caScore || null, firstTest || null, secondTest || null, examScore || null, existing[0].id]
+                    [caScore || 0, firstTest || 0, secondTest || 0, examScore || 0, existing[0].id]
                 );
             } else {
-                await db.query(query, [studentId, studentFullName, subject, caScore || null, firstTest || null, secondTest || null, examScore || null, term]);
+                await db.query(query, [studentId, studentFullName, subject, caScore || 0, firstTest || 0, secondTest || 0, examScore || 0, term]);
             }
         }
 
