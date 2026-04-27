@@ -40,14 +40,14 @@ exports.uploadScore = async (req, res) => {
                         session = ?, times_school_opened = ?, days_present = ?, days_absent = ?, 
                         teacher_comment = ?, principal_comment = ?, uploaded_by = ?, uploaded_by_id = ?, affective_traits = ?, psychomotor_traits = ?, creche_evaluations = ?
                     WHERE id = ?`,
-                    [sex || null, studentClass || null, session, timesSchoolOpened, daysPresent, daysAbsent, teacherComment, principalComment, uploadedBy || null, uploadedById || null, JSON.stringify(affectiveTraits), JSON.stringify(psychomotorTraits), JSON.stringify(crecheEvaluations), existingMeta[0].id]
+                    [sex || null, studentClass || null, session, timesSchoolOpened, daysPresent, daysAbsent, teacherComment, principalComment, uploadedBy || null, uploadedById || null, JSON.stringify(affectiveTraits || {}), JSON.stringify(psychomotorTraits || {}), JSON.stringify(crecheEvaluations || null), existingMeta[0].id]
                 );
             } else {
                 await db.query(
                     `INSERT INTO report_metadata 
                         (student_id, term, sex, class_name, session, times_school_opened, days_present, days_absent, teacher_comment, principal_comment, uploaded_by, uploaded_by_id, affective_traits, psychomotor_traits, creche_evaluations) 
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                    [studentId, term, sex || null, studentClass || null, session, timesSchoolOpened, daysPresent, daysAbsent, teacherComment, principalComment, uploadedBy || null, uploadedById || null, JSON.stringify(affectiveTraits), JSON.stringify(psychomotorTraits), JSON.stringify(crecheEvaluations)]
+                    [studentId, term, sex || null, studentClass || null, session, timesSchoolOpened, daysPresent, daysAbsent, teacherComment, principalComment, uploadedBy || null, uploadedById || null, JSON.stringify(affectiveTraits || {}), JSON.stringify(psychomotorTraits || {}), JSON.stringify(crecheEvaluations || null)]
                 );
             }
         }
