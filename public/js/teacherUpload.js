@@ -502,13 +502,13 @@ async function loadResults() {
     const container = document.getElementById('manageTableContainer');
     const tbody = document.getElementById('manageResultsBody');
 
-    if (!data.success || data.results.length === 0) {
+    if (!data.success || (data.results.length === 0 && (!data.metadata || data.metadata.length === 0))) {
         container.style.display = 'none';
         showManageMsg('No results found for this student and term.', true);
         return;
     }
 
-    showManageMsg(`Loaded ${data.results.length} result(s) for ${term}.`);
+    showManageMsg(`Loaded ${data.results.length} result(s)${data.metadata && data.metadata.length > 0 ? ' (plus metadata)' : ''} for ${term}.`);
     tbody.innerHTML = '';
 
     let totalSum = 0;
@@ -546,7 +546,17 @@ async function loadResults() {
         tbody.appendChild(tr);
     });
 
-    if (data.results.length > 0) {
+    if (data.results.length === 0 && data.metadata && data.metadata.length > 0) {
+        // Only metadata exists (e.g. Creche)
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td colspan="4" style="padding:15px; font-weight:bold; color:var(--text); text-align:center;">Metadata / Behavioral Evaluations Only (e.g. Creche)</td>
+            <td style="padding:10px; text-align:center;">
+                <!-- They can use 'Delete ALL term results' below to clear this -->
+            </td>
+        `;
+        tbody.appendChild(tr);
+    } else if (data.results.length > 0) {
         const average = (totalSum / data.results.length).toFixed(2);
         const avgTr = document.createElement('tr');
         avgTr.style.background = 'rgba(255, 255, 255, 0.03)';

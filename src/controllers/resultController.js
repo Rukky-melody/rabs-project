@@ -137,7 +137,11 @@ exports.getResultsByTerm = async (req, res) => {
             'SELECT * FROM results WHERE student_id = ? AND term = ? ORDER BY subject ASC',
             [studentId, term]
         );
-        res.status(200).json({ success: true, results: rows });
+        const [meta] = await db.query(
+            'SELECT * FROM report_metadata WHERE student_id = ? AND term = ?',
+            [studentId, term]
+        );
+        res.status(200).json({ success: true, results: rows, metadata: meta });
     } catch (error) {
         res.status(500).json({ success: false, message: "Could not retrieve results." });
     }
@@ -165,7 +169,11 @@ exports.deleteTerm = async (req, res) => {
             'DELETE FROM results WHERE student_id = ? AND term = ?',
             [studentId, term]
         );
-        if (result.affectedRows === 0) {
+        const [meta] = await db.query(
+            'DELETE FROM report_metadata WHERE student_id = ? AND term = ?',
+            [studentId, term]
+        );
+        if (result.affectedRows === 0 && meta.affectedRows === 0) {
             return res.status(404).json({ success: false, message: "No results found for this student and term." });
         }
         res.status(200).json({ success: true, message: `All ${term} results deleted successfully.` });
