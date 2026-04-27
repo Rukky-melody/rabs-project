@@ -82,7 +82,16 @@ const classConfigs = {
 };
 
 function getConfig() {
-    return classConfigs[assignedClass] || classConfigs['Basic 1-5'];
+    if (!assignedClass) return classConfigs['Basic 1-5'];
+    
+    const cls = assignedClass.toUpperCase().trim();
+    if (cls === 'CRECHE') return classConfigs['crech'];
+    if (cls === 'PRE-NURSERY') return classConfigs['Pre-nursery'];
+    if (cls.startsWith('NURSERY')) return classConfigs['Nursery 1-3'];
+    if (cls.startsWith('BASIC')) return classConfigs['Basic 1-5'];
+    if (cls.startsWith('JSS')) return classConfigs['Junior secondary school 1-3'];
+    
+    return classConfigs['Basic 1-5']; // fallback
 }
 
 // ─── RENDERING ─────────────────────────────────────────────
