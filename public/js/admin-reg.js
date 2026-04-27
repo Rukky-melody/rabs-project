@@ -7,6 +7,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const adminRegForm = document.getElementById('adminRegForm');
     const regMsg       = document.getElementById('regMsg');
     const submitBtn    = document.getElementById('submitBtn');
+    const roleSelect   = document.getElementById('role');
+    const classGroup   = document.getElementById('classGroup');
+
+    // Toggle class selection based on role
+    if (roleSelect && classGroup) {
+        roleSelect.addEventListener('change', (e) => {
+            if (e.target.value === 'admin') {
+                classGroup.style.display = 'none';
+                document.getElementById('assignedClass').value = '';
+            } else {
+                classGroup.style.display = 'block';
+            }
+        });
+    }
 
     function showMsg(message, type = 'error') {
         const colorMap = {
@@ -29,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 staffName: document.getElementById('staffName').value.trim(),
                 staffId:  document.getElementById('staffId').value.trim(),
                 password: document.getElementById('password').value,
-                role:     document.getElementById('role').value
+                role:     document.getElementById('role').value,
+                assignedClass: document.getElementById('assignedClass').value || null
             };
 
             try {

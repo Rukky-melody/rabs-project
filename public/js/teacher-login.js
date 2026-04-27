@@ -13,6 +13,7 @@ document.getElementById('teacherLoginForm').addEventListener('submit', async (e)
             if (data.success && data.role === 'teacher') {
                 localStorage.setItem('currentStaffId', staffId);
                 localStorage.setItem('staffName', data.staffName || 'Teacher');
+                localStorage.setItem('assignedClass', data.assignedClass || '');
                 window.location.href = 'upload.html';
             } else {
                 alert("Invalid Credentials or Access Level");

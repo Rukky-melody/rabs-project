@@ -2,7 +2,7 @@ const db = require('../config/db');
 
 // TEACHER ACTION: Uploading/Posting scores for a student
 exports.uploadScore = async (req, res) => {
-    const { studentId, studentFullName, term, scores, subject, caScore, examScore, metadata } = req.body;
+    const { studentId, studentFullName, term, scores, subject, caScore, firstTest, secondTest, examScore, metadata } = req.body;
 
     try {
         // First, check if the student ID exists to prevent ghost results
@@ -23,7 +23,8 @@ exports.uploadScore = async (req, res) => {
             const {
                 sex, studentClass,
                 session, timesSchoolOpened, daysPresent, daysAbsent,
-                teacherComment, principalComment, uploadedBy, uploadedById, affectiveTraits, psychomotorTraits
+                teacherComment, principalComment, uploadedBy, uploadedById, affectiveTraits, psychomotorTraits,
+                crecheEvaluations
             } = metadata;
 
             // Upsert metadata
@@ -37,24 +38,24 @@ exports.uploadScore = async (req, res) => {
                     `UPDATE report_metadata SET 
                         sex = ?, class_name = ?,
                         session = ?, times_school_opened = ?, days_present = ?, days_absent = ?, 
-                        teacher_comment = ?, principal_comment = ?, uploaded_by = ?, uploaded_by_id = ?, affective_traits = ?, psychomotor_traits = ?
+                        teacher_comment = ?, principal_comment = ?, uploaded_by = ?, uploaded_by_id = ?, affective_traits = ?, psychomotor_traits = ?, creche_evaluations = ?
                     WHERE id = ?`,
-                    [sex || null, studentClass || null, session, timesSchoolOpened, daysPresent, daysAbsent, teacherComment, principalComment, uploadedBy || null, uploadedById || null, JSON.stringify(affectiveTraits), JSON.stringify(psychomotorTraits), existingMeta[0].id]
+                    [sex || null, studentClass || null, session, timesSchoolOpened, daysPresent, daysAbsent, teacherComment, principalComment, uploadedBy || null, uploadedById || null, JSON.stringify(affectiveTraits), JSON.stringify(psychomotorTraits), JSON.stringify(crecheEvaluations), existingMeta[0].id]
                 );
             } else {
                 await db.query(
                     `INSERT INTO report_metadata 
-                        (student_id, term, sex, class_name, session, times_school_opened, days_present, days_absent, teacher_comment, principal_comment, uploaded_by, uploaded_by_id, affective_traits, psychomotor_traits) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                    [studentId, term, sex || null, studentClass || null, session, timesSchoolOpened, daysPresent, daysAbsent, teacherComment, principalComment, uploadedBy || null, uploadedById || null, JSON.stringify(affectiveTraits), JSON.stringify(psychomotorTraits)]
+                        (student_id, term, sex, class_name, session, times_school_opened, days_present, days_absent, teacher_comment, principal_comment, uploaded_by, uploaded_by_id, affective_traits, psychomotor_traits, creche_evaluations) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                    [studentId, term, sex || null, studentClass || null, session, timesSchoolOpened, daysPresent, daysAbsent, teacherComment, principalComment, uploadedBy || null, uploadedById || null, JSON.stringify(affectiveTraits), JSON.stringify(psychomotorTraits), JSON.stringify(crecheEvaluations)]
                 );
             }
         }
 
         // Insert the scores into the results table
         const query = `
-            INSERT INTO results (student_id, student_fullname, subject, ca_score, exam_score, term) 
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO results (student_id, student_fullname, subject, ca_score, first_test, second_test, exam_score, term) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
         
         if (scores && Array.isArray(scores)) {
@@ -67,14 +68,14 @@ exports.uploadScore = async (req, res) => {
 
                 if (existing.length > 0) {
                     await db.query(
-                        'UPDATE results SET ca_score = ?, exam_score = ? WHERE id = ?',
-                        [score.caScore, score.examScore, existing[0].id]
+                        'UPDATE results SET ca_score = ?, first_test = ?, second_test = ?, exam_score = ? WHERE id = ?',
+                        [score.caScore || null, score.firstTest || null, score.secondTest || null, score.examScore || null, existing[0].id]
                     );
                 } else {
-                    await db.query(query, [studentId, studentFullName, score.subject, score.caScore, score.examScore, term]);
+                    await db.query(query, [studentId, studentFullName, score.subject, score.caScore || null, score.firstTest || null, score.secondTest || null, score.examScore || null, term]);
                 }
             }
-        } else {
+        } else if (subject) {
             // Fallback
             const [existing] = await db.query(
                 'SELECT id FROM results WHERE student_id = ? AND subject = ? AND term = ?',
@@ -83,11 +84,11 @@ exports.uploadScore = async (req, res) => {
 
             if (existing.length > 0) {
                 await db.query(
-                    'UPDATE results SET ca_score = ?, exam_score = ? WHERE id = ?',
-                    [caScore, examScore, existing[0].id]
+                    'UPDATE results SET ca_score = ?, first_test = ?, second_test = ?, exam_score = ? WHERE id = ?',
+                    [caScore || null, firstTest || null, secondTest || null, examScore || null, existing[0].id]
                 );
             } else {
-                await db.query(query, [studentId, studentFullName, subject, caScore, examScore, term]);
+                await db.query(query, [studentId, studentFullName, subject, caScore || null, firstTest || null, secondTest || null, examScore || null, term]);
             }
         }
 

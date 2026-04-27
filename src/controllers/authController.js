@@ -2,11 +2,11 @@ const db = require('../config/db');
 
 // ADMIN ACTION: Registering Teachers/Staff
 exports.registerStaff = async (req, res) => {
-    const { staffId, password, role, staffName } = req.body;
+    const { staffId, password, role, staffName, assignedClass } = req.body;
 
     try {
-        const query = 'INSERT INTO staff (staff_id, password, role, staff_name) VALUES (?, ?, ?, ?)';
-        await db.query(query, [staffId, password, role, staffName]);
+        const query = 'INSERT INTO staff (staff_id, password, role, staff_name, assigned_class) VALUES (?, ?, ?, ?, ?)';
+        await db.query(query, [staffId, password, role, staffName, assignedClass || null]);
         
         res.status(201).json({ success: true, message: "Staff account created successfully." });
     } catch (error) {
@@ -26,7 +26,8 @@ exports.loginStaff = async (req, res) => {
                 success: true, 
                 role: rows[0].role,
                 staffName: rows[0].staff_name,
-                staffId: rows[0].staff_id
+                staffId: rows[0].staff_id,
+                assignedClass: rows[0].assigned_class
             });
         } else {
             res.status(401).json({ success: false, message: "Invalid ID or Password" });

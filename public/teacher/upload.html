@@ -62,63 +62,9 @@
                     </div>
                 </div>
 
-                <div style="margin-top: 2rem; margin-bottom: 2rem; overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 1rem; color: var(--text);">
-                        <thead>
-                            <tr style="border-bottom: 1px solid var(--border); text-align: left;">
-                                <th style="padding: 10px;">Subject</th>
-                                <th style="padding: 10px; width: 120px;">Test (30)</th>
-                                <th style="padding: 10px; width: 120px;">Exam (70)</th>
-                                <th style="padding: 10px; width: 100px;">Total</th>
-                                <th style="padding: 10px; width: 80px;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="subjectsBody">
-                            <!-- Predefined Subjects injected by JS -->
-                        </tbody>
-                    </table>
-                    <div id="averageDisplay" style="margin-bottom: 1rem; text-align: right; font-size: 1.1rem; color: var(--text);">
-                        Term Average: <strong id="termAverage">0.00%</strong>
-                    </div>
-                    <button type="button" id="addRowBtn" style="background: transparent; border: 1px dashed var(--border); color: var(--text-muted); padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; text-align: center;">+ Add Extra Subject</button>
-                </div>
-
-                <!-- Report Metadata Section -->
-                <h3 style="color: var(--text); margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">Report Metadata</h3>
-                
-                <div class="form-grid" style="margin-top: 1rem;">
-                    <div class="form-group">
-                        <label for="session">Session</label>
-                        <input type="text" id="session" placeholder="e.g., 2025/2026 Session">
-                    </div>
-                    <div class="form-group">
-                        <label for="timesSchoolOpened">Times School Opened</label>
-                        <input type="number" id="timesSchoolOpened" placeholder="114">
-                    </div>
-                    <div class="form-group">
-                        <label for="daysPresent">Days Present</label>
-                        <input type="number" id="daysPresent" placeholder="112">
-                    </div>
-                    <div class="form-group">
-                        <label for="daysAbsent">Days Absent</label>
-                        <input type="number" id="daysAbsent" placeholder="4">
-                    </div>
-                </div>
-
-                <!-- Traits -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
-                    <div>
-                        <h4 style="color: var(--text); margin-bottom: 0.5rem;">Affective Domain (1-5)</h4>
-                        <div id="affectiveTraitsContainer" style="display: flex; flex-direction: column; gap: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">
-                            <!-- Injected by JS -->
-                        </div>
-                    </div>
-                    <div>
-                        <h4 style="color: var(--text); margin-bottom: 0.5rem;">Psychomotor Assessment (1-5)</h4>
-                        <div id="psychomotorTraitsContainer" style="display: flex; flex-direction: column; gap: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">
-                            <!-- Injected by JS -->
-                        </div>
-                    </div>
+                <!-- Dynamic Form Container for Class-Specific Result Interfaces -->
+                <div id="dynamicFormContainer">
+                    <!-- Injected by teacherUpload.js -->
                 </div>
 
                 <!-- Comments -->

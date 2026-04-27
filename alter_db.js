@@ -65,6 +65,38 @@ async function alterTable() {
         else console.error('Error adding uploaded_by_id:', e);
     }
     
+    try {
+        await db.query("ALTER TABLE staff ADD COLUMN assigned_class VARCHAR(100)");
+        console.log('Added assigned_class column to staff');
+    } catch (e) {
+        if (e.code === 'ER_DUP_FIELDNAME') console.log('assigned_class already exists in staff');
+        else console.error('Error adding assigned_class:', e);
+    }
+    
+    try {
+        await db.query("ALTER TABLE results ADD COLUMN first_test DECIMAL(5,2)");
+        console.log('Added first_test column to results');
+    } catch (e) {
+        if (e.code === 'ER_DUP_FIELDNAME') console.log('first_test already exists in results');
+        else console.error('Error adding first_test:', e);
+    }
+
+    try {
+        await db.query("ALTER TABLE results ADD COLUMN second_test DECIMAL(5,2)");
+        console.log('Added second_test column to results');
+    } catch (e) {
+        if (e.code === 'ER_DUP_FIELDNAME') console.log('second_test already exists in results');
+        else console.error('Error adding second_test:', e);
+    }
+
+    try {
+        await db.query("ALTER TABLE report_metadata ADD COLUMN creche_evaluations JSON");
+        console.log('Added creche_evaluations column to report_metadata');
+    } catch (e) {
+        if (e.code === 'ER_DUP_FIELDNAME') console.log('creche_evaluations already exists in report_metadata');
+        else console.error('Error adding creche_evaluations:', e);
+    }
+    
     process.exit(0);
 }
 
