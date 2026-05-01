@@ -123,17 +123,14 @@ async function fetchResults(term = 'First Term') {
             const principalLabel  = document.getElementById('lblPrincipalLabel');
 
             if (isPrenursery) {
-                // Show Pre-Nursery info block
                 if (standardBlock)   standardBlock.style.display   = 'none';
                 if (prenurseryBlock) prenurseryBlock.style.display  = 'block';
+                const nurseryBlock = document.getElementById('nurseryInfoBlock');
+                if (nurseryBlock) nurseryBlock.style.display = 'none';
 
-                // Set report title
                 if (reportTitle) reportTitle.innerText = 'PRE-NURSERY TERMLY RESULT';
-
-                // Rename principal label
                 if (principalLabel) principalLabel.innerText = 'HEAD TEACHER\'S REMARK:';
 
-                // Populate Pre-Nursery specific fields
                 document.getElementById('pnName').innerText         = studentName || '--';
                 document.getElementById('pnAge').innerText          = meta.age || '--';
                 document.getElementById('pnClass').innerText        = meta.class_name || '--';
@@ -143,6 +140,33 @@ async function fetchResults(term = 'First Term') {
                 document.getElementById('pnTimePresent').innerText  = meta.days_present || '--';
                 document.getElementById('pnTimeAbsent').innerText   = meta.days_absent || '--';
                 document.getElementById('pnNumberInClass').innerText = numberOfStudents;
+
+            } else if (className.startsWith('NURSERY')) {
+                // ── Nursery info block ──
+                if (standardBlock)   standardBlock.style.display   = 'none';
+                if (prenurseryBlock) prenurseryBlock.style.display  = 'none';
+                const nurseryBlock = document.getElementById('nurseryInfoBlock');
+                if (nurseryBlock) nurseryBlock.style.display = 'block';
+
+                if (reportTitle) reportTitle.innerText = 'NURSERY TERMLY RESULT';
+                if (principalLabel) principalLabel.innerText = 'HEAD TEACHER\'S COMMENT:';
+
+                // Calculate last term commutative aggregate
+                const prevTermName = term === 'Second Term' ? 'First Term' : term === 'Third Term' ? 'Second Term' : null;
+                const prevResults  = prevTermName ? (data.results || []).filter(r => r.term === prevTermName) : [];
+                const lastTermAgg  = prevResults.reduce((s, r) =>
+                    s + (parseFloat(r.first_test)||0) + (parseFloat(r.second_test)||0) + (parseFloat(r.exam_score)||0), 0);
+
+                document.getElementById('nrName').innerText         = studentName || '--';
+                document.getElementById('nrClass').innerText        = meta.class_name || '--';
+                document.getElementById('nrAge').innerText          = meta.age || '--';
+                document.getElementById('nrSession').innerText      = meta.session || '--';
+                document.getElementById('nrTerm').innerText         = term;
+                document.getElementById('nrSchoolOpened').innerText = meta.times_school_opened || '--';
+                document.getElementById('nrTimePresent').innerText  = meta.days_present || '--';
+                document.getElementById('nrTimeAbsent').innerText   = meta.days_absent || '--';
+                document.getElementById('nrNumberInClass').innerText = numberOfStudents;
+                document.getElementById('nrLastTermComm').innerText  = prevTermName ? lastTermAgg : '--';
 
             } else {
                 // Show standard info block
@@ -174,6 +198,9 @@ async function fetchResults(term = 'First Term') {
                 container.innerHTML = renderCreche(meta);
             } else if (isPrenursery) {
                 container.innerHTML = renderPrenursery(termResults, meta, calculatedPosition, numberOfStudents);
+            } else if (className.startsWith('NURSERY')) {
+                const termSubjectRanks = (data.subjectRankMap || {})[term] || {};
+                container.innerHTML = renderNursery(termResults, meta, data, calculatedPosition, numberOfStudents, termSubjectRanks);
             } else {
                 container.innerHTML = renderStandard(termResults, meta, data);
             }
@@ -300,9 +327,136 @@ function renderPrenursery(results, metadata, calculatedPosition, numberOfStudent
 
     return html;
 }
+function getNurseryGrade(total) {
+    if (total >= 70) return { grade: 'A', label: 'Excellent' };
+    if (total >= 60) return { grade: 'B', label: 'Good' };
+    if (total >= 50) return { grade: 'C', label: 'Satisfactory' };
+    if (total >= 40) return { grade: 'D', label: 'Fair' };
+    return              { grade: 'F', label: 'Poor' };
+}
 
+function renderNursery(results, metadata, allData, calculatedPosition, numberOfStudents, subjectRanks) {
+    const termName   = results[0]?.term || '';
+    const prevTermName = termName === 'Second Term' ? 'First Term' : termName === 'Third Term' ? 'Second Term' : null;
+    const prevResults  = prevTermName ? (allData.results || []).filter(r => r.term === prevTermName) : [];
+    const prevMap = {};
+    prevResults.forEach(r => {
+        prevMap[r.subject] = (parseFloat(r.first_test)||0) + (parseFloat(r.second_test)||0) + (parseFloat(r.exam_score)||0);
+    });
+
+    // Marks Obtainable row values
+    const maxT1 = 20, maxT2 = 20, maxExam = 60, maxTotal = 100;
+    let aggregateScore = 0;
+
+    // Build cognitive rows
+    let cogRows = `<tr style="background:#f0f0f0; font-weight:bold;">
+        <td style="text-align:left; font-style:italic;">Marks Obtainable</td>
+        <td>${maxT1}</td><td>${maxT2}</td><td>${maxExam}</td><td>${maxTotal}</td>
+        <td>--</td><td>--</td><td>--</td><td>--</td>
+    </tr>`;
+
+    results.forEach(row => {
+        const t1   = parseFloat(row.first_test)  || 0;
+        const t2   = parseFloat(row.second_test) || 0;
+        const exam = parseFloat(row.exam_score)  || 0;
+        const total = t1 + t2 + exam;
+        aggregateScore += total;
+        const { grade } = getNurseryGrade(total);
+        const lastComm = prevMap[row.subject] !== undefined ? prevMap[row.subject] : '--';
+        const subPos   = subjectRanks[row.subject] || '--';
+        const remark   = row.remark || '';
+        cogRows += `<tr>
+            <td style="text-align:left; font-weight:bold;">${row.subject.toUpperCase()}</td>
+            <td>${t1}</td><td>${t2}</td><td>${exam}</td><td><strong>${total}</strong></td>
+            <td>${lastComm}</td><td><strong>${grade}</strong></td><td>${subPos}</td><td>${remark}</td>
+        </tr>`;
+    });
+
+    // Build observation traits
+    let affTraitsObj = {}, psyTraitsObj = {};
+    try {
+        affTraitsObj = typeof metadata.affective_traits === 'string' ? JSON.parse(metadata.affective_traits) : (metadata.affective_traits || {});
+        psyTraitsObj = typeof metadata.psychomotor_traits === 'string' ? JSON.parse(metadata.psychomotor_traits) : (metadata.psychomotor_traits || {});
+    } catch(e) {}
+
+    const traitRow = (name, score, cols) => {
+        let cells = '';
+        for (let i = 1; i <= cols; i++) cells += `<td>${score === i ? '&#10003;' : ''}</td>`;
+        return `<tr><td style="text-align:left; font-size:11px;">${name}</td>${cells}</tr>`;
+    };
+
+    let obsRows = Object.entries(affTraitsObj).map(([k,v]) => traitRow(k, v, 5)).join('');
+    let phyRows = Object.entries(psyTraitsObj).map(([k,v]) => traitRow(k, v, 5)).join('');
+
+    const html = `
+    <div style="display:grid; grid-template-columns:1.6fr 1fr; gap:8px; margin-bottom:16px;">
+        <!-- Left: Cognitive Record -->
+        <div style="overflow-x:auto;">
+            <div class="section-header">COGNITIVE RECORD</div>
+            <table class="data-table" style="font-size:11px; min-width:400px;">
+                <thead>
+                    <tr>
+                        <th rowspan="2" style="text-align:left; min-width:120px;">SUBJECTS</th>
+                        <th>1st<br>Test</th><th>2nd<br>Test</th><th>Term's<br>Exam</th><th>Total</th>
+                        <th>Last Term<br>Comm</th><th>Grade</th><th>Subject<br>Position</th><th>Teacher's<br>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>${cogRows}</tbody>
+            </table>
+        </div>
+        <!-- Right: Observation & Conduct + Physical Skills -->
+        <div>
+            ${obsRows ? `
+            <div class="behavior-header">OBSERVATION AND CONDUCT</div>
+            <table class="behavior-table" style="font-size:11px; width:100%;">
+                <thead><tr><th style="text-align:left;">Trait</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead>
+                <tbody>${obsRows}</tbody>
+            </table>` : ''}
+            ${phyRows ? `
+            <div class="behavior-header" style="margin-top:8px;">PERFORMANCE IN PHYSICAL SKILLS</div>
+            <table class="behavior-table" style="font-size:11px; width:100%;">
+                <thead><tr><th style="text-align:left;">Skills</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead>
+                <tbody>${phyRows}</tbody>
+            </table>` : ''}
+        </div>
+    </div>
+
+    <!-- Bottom section -->
+    <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:16px; margin-top:8px;">
+        <div>
+            <p style="font-size:13px; margin-bottom:6px;"><strong>AGGREGATE SCORE:</strong> ${aggregateScore}</p>
+            <p style="font-size:13px; margin-bottom:6px;"><strong>POSITION IN CLASS:</strong> ${calculatedPosition}</p>
+            <p style="font-size:13px; margin-bottom:14px;"><strong>STATUS:</strong> ${metadata.status || '--'}</p>
+            <table class="data-table" style="font-size:12px;">
+                <tbody>
+                    <tr><td style="text-align:left; font-weight:bold; width:55%;">Class Teacher Comment</td><td style="text-align:left;">${metadata.teacher_comment || '--'}</td></tr>
+                    <tr><td style="text-align:left; font-weight:bold;">Head Teacher Comment</td><td style="text-align:left;">${metadata.principal_comment || '--'}</td></tr>
+                    <tr><td style="text-align:left; font-weight:bold;">Area Improvement is Needed</td><td style="text-align:left;">${metadata.area_improvement || '--'}</td></tr>
+                    <tr><td style="text-align:left; font-weight:bold;">End of Term</td><td style="text-align:left;">${metadata.end_of_term || '--'}</td></tr>
+                    <tr><td style="text-align:left; font-weight:bold;">Next Term Begins</td><td style="text-align:left;">${metadata.next_term_begins || '--'}</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <div class="behavior-header">KEY TO RATINGS</div>
+            <table class="behavior-table" style="font-size:12px; width:100%;">
+                <thead><tr><th></th><th style="text-align:left;">Description</th><th>Score</th><th>Grade</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>5</strong></td><td style="text-align:left;">Excellent in trait</td><td>70 &amp; Above</td><td>A</td></tr>
+                    <tr><td><strong>4</strong></td><td style="text-align:left;">Good in trait</td><td>60-69</td><td>B</td></tr>
+                    <tr><td><strong>3</strong></td><td style="text-align:left;">Satisfactory in trait</td><td>50-59</td><td>C</td></tr>
+                    <tr><td><strong>2</strong></td><td style="text-align:left;">Fair in trait</td><td>40-49</td><td>D</td></tr>
+                    <tr><td><strong>1</strong></td><td style="text-align:left;">Poor in trait</td><td>0-39</td><td>F</td></tr>
+                </tbody>
+            </table>
+            <div style="margin-top:16px; font-weight:bold; text-decoration:underline; font-size:13px;">SCHOOL STAMP</div>
+        </div>
+    </div>`;
+    return html;
+}
 
 function renderStandard(results, metadata, allData) {
+
     // Standard layout (Nursery 1-3, Basic 1-5, JSS 1-3)
     let totalScore = 0;
     results.forEach(r => totalScore += (parseFloat(r.first_test)||0) + (parseFloat(r.second_test)||0) + (parseFloat(r.exam_score)||0));

@@ -146,6 +146,10 @@ function renderDynamicForm() {
                 <label for="nextTermBegins">Next Term Begins</label>
                 <input type="text" id="nextTermBegins" placeholder="e.g. 5th May 2026">
             </div>
+            <div class="form-group">
+                <label for="areaImprovement">Area Improvement Needed</label>
+                <input type="text" id="areaImprovement" placeholder="e.g. Reading comprehension">
+            </div>
         </div>
     `;
 
@@ -282,6 +286,9 @@ function getStandardRowHTML(sub) {
             <td style="padding: 10px;">
                 <strong class="total-score-display">0</strong>
             </td>
+            <td style="padding: 10px;">
+                <input type="text" class="remark-input" placeholder="Remark" style="width: 100%; border: 1px solid var(--border); padding: 8px; border-radius: 4px; background: transparent; color: var(--text);">
+            </td>
             <td style="padding: 10px; text-align: center;">
                 <button type="button" class="remove-row-btn" style="color: var(--error); background: transparent; border: none; cursor: pointer; font-size: 1.1rem; outline: none; ${sub ? 'display:none;' : ''}"><i class="fa-solid fa-delete-left"></i></button>
             </td>
@@ -299,6 +306,7 @@ function renderStandardForm(config) {
                     <th style="padding: 10px; width: 100px;">2nd Test (20)</th>
                     <th style="padding: 10px; width: 100px;">Exam (60)</th>
                     <th style="padding: 10px; width: 80px;">Total</th>
+                    <th style="padding: 10px; width: 160px;">Teacher's Remarks</th>
                     <th style="padding: 10px; width: 50px;"></th>
                 </tr>
             </thead>
@@ -455,6 +463,7 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
                 const t1 = row.querySelector('.first-test-input').value;
                 const t2 = row.querySelector('.second-test-input').value;
                 const exam = row.querySelector('.exam-input').value;
+                const remark = row.querySelector('.remark-input')?.value || '';
                 
                 if (t1 !== "" || t2 !== "" || exam !== "") {
                     scores.push({
@@ -462,7 +471,8 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
                         firstTest: t1 ? parseFloat(t1) : 0,
                         secondTest: t2 ? parseFloat(t2) : 0,
                         caScore: 0,
-                        examScore: exam ? parseFloat(exam) : 0
+                        examScore: exam ? parseFloat(exam) : 0,
+                        remark: remark
                     });
                 }
             }
@@ -504,6 +514,7 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
         status: document.getElementById('status').value || '',
         endOfTerm: document.getElementById('endOfTerm').value || '',
         nextTermBegins: document.getElementById('nextTermBegins').value || '',
+        areaImprovement: document.getElementById('areaImprovement')?.value || '',
         teacherComment: document.getElementById('teacherComment').value || '',
         principalComment: document.getElementById('principalComment').value || '',
         uploadedBy: currentStaffName,

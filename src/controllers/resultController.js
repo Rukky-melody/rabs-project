@@ -25,10 +25,9 @@ exports.uploadScore = async (req, res) => {
                 session, timesSchoolOpened, daysPresent, daysAbsent,
                 teacherComment, principalComment, uploadedBy, uploadedById, affectiveTraits, psychomotorTraits,
                 crecheEvaluations,
-                age, numberInClass, position, status, endOfTerm, nextTermBegins
+                age, numberInClass, position, status, endOfTerm, nextTermBegins, areaImprovement
             } = metadata;
 
-            // Upsert metadata
             const [existingMeta] = await db.query(
                 'SELECT id FROM report_metadata WHERE student_id = ? AND term = ?',
                 [studentId, term]
@@ -39,27 +38,34 @@ exports.uploadScore = async (req, res) => {
                     `UPDATE report_metadata SET 
                         sex = ?, class_name = ?,
                         session = ?, times_school_opened = ?, days_present = ?, days_absent = ?, 
-                        teacher_comment = ?, principal_comment = ?, uploaded_by = ?, uploaded_by_id = ?, affective_traits = ?, psychomotor_traits = ?, creche_evaluations = ?,
-                        age = ?, number_in_class = ?, position = ?, status = ?, end_of_term = ?, next_term_begins = ?
+                        teacher_comment = ?, principal_comment = ?, uploaded_by = ?, uploaded_by_id = ?,
+                        affective_traits = ?, psychomotor_traits = ?, creche_evaluations = ?,
+                        age = ?, number_in_class = ?, position = ?, status = ?,
+                        end_of_term = ?, next_term_begins = ?, area_improvement = ?
                     WHERE id = ?`,
                     [
-                        sex || null, studentClass || null, session, timesSchoolOpened, daysPresent, daysAbsent, 
-                        teacherComment, principalComment, uploadedBy || null, uploadedById || null, 
+                        sex || null, studentClass || null, session, timesSchoolOpened, daysPresent, daysAbsent,
+                        teacherComment, principalComment, uploadedBy || null, uploadedById || null,
                         JSON.stringify(affectiveTraits || {}), JSON.stringify(psychomotorTraits || {}), JSON.stringify(crecheEvaluations || null),
-                        age || null, numberInClass || null, position || null, status || null, endOfTerm || null, nextTermBegins || null,
+                        age || null, numberInClass || null, position || null, status || null,
+                        endOfTerm || null, nextTermBegins || null, areaImprovement || null,
                         existingMeta[0].id
                     ]
                 );
             } else {
                 await db.query(
                     `INSERT INTO report_metadata 
-                        (student_id, term, sex, class_name, session, times_school_opened, days_present, days_absent, teacher_comment, principal_comment, uploaded_by, uploaded_by_id, affective_traits, psychomotor_traits, creche_evaluations, age, number_in_class, position, status, end_of_term, next_term_begins) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                        (student_id, term, sex, class_name, session, times_school_opened, days_present, days_absent,
+                         teacher_comment, principal_comment, uploaded_by, uploaded_by_id,
+                         affective_traits, psychomotor_traits, creche_evaluations,
+                         age, number_in_class, position, status, end_of_term, next_term_begins, area_improvement) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                     [
-                        studentId, term, sex || null, studentClass || null, session, timesSchoolOpened, daysPresent, daysAbsent, 
-                        teacherComment, principalComment, uploadedBy || null, uploadedById || null, 
+                        studentId, term, sex || null, studentClass || null, session, timesSchoolOpened, daysPresent, daysAbsent,
+                        teacherComment, principalComment, uploadedBy || null, uploadedById || null,
                         JSON.stringify(affectiveTraits || {}), JSON.stringify(psychomotorTraits || {}), JSON.stringify(crecheEvaluations || null),
-                        age || null, numberInClass || null, position || null, status || null, endOfTerm || null, nextTermBegins || null
+                        age || null, numberInClass || null, position || null, status || null,
+                        endOfTerm || null, nextTermBegins || null, areaImprovement || null
                     ]
                 );
             }
@@ -184,11 +190,38 @@ exports.getStudentResults = async (req, res) => {
             classRankMap[term] = { calculatedPosition: position, numberOfStudents };
         }
 
+        // ── Per-subject ranking (batch query per term) ──
+        const subjectRankMap = {};
+        for (const meta of metaRows) {
+            const { term, class_name } = meta;
+            if (!class_name || !term) continue;
+            const [allSubjectRows] = await db.query(
+                `SELECT r.student_id, r.subject,
+                        (COALESCE(r.first_test,0)+COALESCE(r.second_test,0)+COALESCE(r.exam_score,0)) AS total
+                 FROM results r
+                 JOIN report_metadata m ON r.student_id = m.student_id AND r.term = m.term
+                 WHERE m.class_name = ? AND m.term = ?`,
+                [class_name, term]
+            );
+            const bySubject = {};
+            allSubjectRows.forEach(({ student_id, subject, total }) => {
+                if (!bySubject[subject]) bySubject[subject] = [];
+                bySubject[subject].push({ student_id, total });
+            });
+            subjectRankMap[term] = {};
+            Object.entries(bySubject).forEach(([subject, students]) => {
+                students.sort((a, b) => b.total - a.total);
+                const idx = students.findIndex(s => s.student_id === studentId);
+                subjectRankMap[term][subject] = idx >= 0 ? getOrdinal(idx + 1) : '--';
+            });
+        }
+
         res.status(200).json({ 
             success: true, 
             results: rows,
             metadata: metaRows,
-            classRankMap   // e.g. { "First Term": { calculatedPosition: "1st", numberOfStudents: 20 } }
+            classRankMap,
+            subjectRankMap
         });
     } catch (error) {
         console.error(error);
