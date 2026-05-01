@@ -343,17 +343,19 @@
 
             <!-- Report Header -->
             <div class="header">
-                <div class="img-placeholder" id="reportPhoto">STUDENT<br>PHOTO</div>
+                <div class="img-placeholder logo-placeholder">SCHOOL<br>LOGO</div>
                 <div class="header-center">
-                    <h1>RUKKYS<br>MODERN ACADEMY</h1>
-                    <h2>Academic Report Sheet: <span id="displayTerm">--</span> <span id="displaySession">--</span></h2>
-                    <h3>Achievement of Cognitive Domain</h3>
+                    <h1>CHRISTAR CROWNS SCHOOL</h1>
+                    <h3 style="font-style:italic; margin-bottom:3px;">Motto: Godliness Discipline and Excllence</h3>
+                    <h3>Behind Udu Market, Beside Church of God, Udu Road,<br>Udu L.G.A., Delta State.</h3>
+                    <h2 id="reportTitle" style="margin-top:8px; border:2px solid #000; display:inline-block; padding:3px 16px; font-size:14px; letter-spacing:1px;">ACADEMIC REPORT SHEET</h2>
+                    <div style="margin-top:4px; font-size:13px;"><span id="displayTerm">--</span> &bull; <span id="displaySession">--</span></div>
                 </div>
-                <div class="img-placeholder logo-placeholder">SCHOOL<br>SEAL</div>
+                <div class="img-placeholder" id="reportPhoto">STUDENT<br>PHOTO</div>
             </div>
 
-            <!-- Student Info Block -->
-            <div class="info-grid">
+            <!-- Student Info Block: Standard (Nursery / Basic / JSS) -->
+            <div class="info-grid" id="standardInfoBlock">
                 <div>
                     <table class="info-table">
                         <tr><td>Surname:</td><td id="lblSurname">--</td></tr>
@@ -371,6 +373,31 @@
                 </div>
             </div>
 
+            <!-- Student Info Block: Pre-Nursery (matches physical report card exactly) -->
+            <div id="prenurseryInfoBlock" style="display:none; margin-bottom:20px; font-size:13px;">
+                <table style="width:100%; border-collapse:collapse;">
+                    <tr>
+                        <td style="padding:6px 4px; border-bottom:1px solid #000; width:65%;"><strong>NAME:</strong> <span id="pnName">--</span></td>
+                        <td style="padding:6px 4px; border-bottom:1px solid #000;"><strong>AGE:</strong> <span id="pnAge">--</span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:6px 4px; border-bottom:1px solid #000;"><strong>CLASS:</strong> <span id="pnClass">--</span></td>
+                        <td style="padding:6px 4px; border-bottom:1px solid #000;"><strong>SESSION:</strong> <span id="pnSession">--</span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:6px 4px; border-bottom:1px solid #000;"><strong>TERM:</strong> <span id="pnTerm">--</span></td>
+                        <td style="padding:6px 4px; border-bottom:1px solid #000;"><strong>TIME SCHOOL OPENED:</strong> <span id="pnSchoolOpened">--</span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:6px 4px; border-bottom:1px solid #000;"><strong>TIME PRESENT:</strong> <span id="pnTimePresent">--</span></td>
+                        <td style="padding:6px 4px; border-bottom:1px solid #000;"><strong>TIME ABSENT:</strong> <span id="pnTimeAbsent">--</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="padding:6px 4px; border-bottom:2px solid #000;"><strong>NUMBER IN CLASS:</strong> <span id="pnNumberInClass">--</span></td>
+                    </tr>
+                </table>
+            </div>
+
             <!-- Dynamic Report Container (Injected by JS) -->
             <div id="dynamicReportContainer"></div>
 
@@ -385,7 +412,7 @@
                     <td id="lblTeacherName" style="font-weight:bold;">--</td>
                 </tr>
                 <tr>
-                    <td class="label">PRINCIPAL'S COMMENT:</td>
+                    <td class="label" id="lblPrincipalLabel">PRINCIPAL'S COMMENT:</td>
                     <td id="lblPrincipalComment" style="font-style:italic;">--</td>
                 </tr>
             </table>

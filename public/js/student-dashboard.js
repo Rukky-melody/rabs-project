@@ -103,39 +103,84 @@ async function fetchResults(term = 'First Term') {
 
             const meta = termMetadata || {};
 
-            // --- Populate Header ---
+            // --- Populate shared header spans ---
             document.getElementById('displayTerm').innerText = term;
             document.getElementById('displaySession').innerText = meta.session || 'N/A';
 
-            // --- Populate Student Info Block ---
-            const nameParts = (studentName || '').split(' ');
-            const surname = nameParts.length > 0 ? nameParts[0] : '--';
-            const otherNames = nameParts.slice(1).join(' ') || '--';
-            
-            document.getElementById('lblSurname').innerText = surname.toUpperCase();
-            document.getElementById('lblOtherNames').innerText = otherNames.toUpperCase();
-            document.getElementById('lblClass').innerText = meta.class_name || studentClass || '--';
-            document.getElementById('lblSex').innerText = meta.sex || '--';
-            
-            document.getElementById('lblSchoolOpened').innerText = meta.times_school_opened || '--';
-            document.getElementById('lblDaysPresent').innerText = meta.days_present || '--';
-            document.getElementById('lblDaysAbsent').innerText = meta.days_absent || '--';
-
-            // --- Determine Layout based on Class Name ---
+            // --- Determine class type ---
             const className = (meta.class_name || '').toUpperCase().trim();
+            const isPrenursery = className === 'PRE-NURSERY';
+
+            // --- Auto-calculated rank data from backend ---
+            const rankData = (data.classRankMap || {})[term] || {};
+            const calculatedPosition = rankData.calculatedPosition || '--';
+            const numberOfStudents   = rankData.numberOfStudents   || '--';
+
+            // --- Set report title and show/hide info blocks ---
+            const reportTitle = document.getElementById('reportTitle');
+            const standardBlock   = document.getElementById('standardInfoBlock');
+            const prenurseryBlock = document.getElementById('prenurseryInfoBlock');
+            const principalLabel  = document.getElementById('lblPrincipalLabel');
+
+            if (isPrenursery) {
+                // Show Pre-Nursery info block
+                if (standardBlock)   standardBlock.style.display   = 'none';
+                if (prenurseryBlock) prenurseryBlock.style.display  = 'block';
+
+                // Set report title
+                if (reportTitle) reportTitle.innerText = 'PRE-NURSERY TERMLY RESULT';
+
+                // Rename principal label
+                if (principalLabel) principalLabel.innerText = 'HEAD TEACHER\'S REMARK:';
+
+                // Populate Pre-Nursery specific fields
+                document.getElementById('pnName').innerText         = studentName || '--';
+                document.getElementById('pnAge').innerText          = meta.age || '--';
+                document.getElementById('pnClass').innerText        = meta.class_name || '--';
+                document.getElementById('pnSession').innerText      = meta.session || '--';
+                document.getElementById('pnTerm').innerText         = term;
+                document.getElementById('pnSchoolOpened').innerText = meta.times_school_opened || '--';
+                document.getElementById('pnTimePresent').innerText  = meta.days_present || '--';
+                document.getElementById('pnTimeAbsent').innerText   = meta.days_absent || '--';
+                document.getElementById('pnNumberInClass').innerText = numberOfStudents;
+
+            } else {
+                // Show standard info block
+                if (prenurseryBlock) prenurseryBlock.style.display = 'none';
+                if (standardBlock)   standardBlock.style.display   = 'grid';
+
+                // Reset report title and labels
+                if (reportTitle) reportTitle.innerText = 'ACADEMIC REPORT SHEET';
+                if (principalLabel) principalLabel.innerText = 'PRINCIPAL\'S COMMENT:';
+
+                // Populate standard fields
+                const nameParts  = (studentName || '').split(' ');
+                const surname    = nameParts.length > 0 ? nameParts[0] : '--';
+                const otherNames = nameParts.slice(1).join(' ') || '--';
+
+                document.getElementById('lblSurname').innerText    = surname.toUpperCase();
+                document.getElementById('lblOtherNames').innerText = otherNames.toUpperCase();
+                document.getElementById('lblClass').innerText      = meta.class_name || studentClass || '--';
+                document.getElementById('lblSex').innerText        = meta.sex || '--';
+                document.getElementById('lblSchoolOpened').innerText = meta.times_school_opened || '--';
+                document.getElementById('lblDaysPresent').innerText  = meta.days_present || '--';
+                document.getElementById('lblDaysAbsent').innerText   = meta.days_absent || '--';
+            }
+
+            // --- Render dynamic section ---
             const container = document.getElementById('dynamicReportContainer');
-            
+
             if (className === 'CRECHE') {
                 container.innerHTML = renderCreche(meta);
-            } else if (className === 'PRE-NURSERY') {
-                container.innerHTML = renderPrenursery(termResults, meta);
+            } else if (isPrenursery) {
+                container.innerHTML = renderPrenursery(termResults, meta, calculatedPosition, numberOfStudents);
             } else {
                 container.innerHTML = renderStandard(termResults, meta, data);
             }
 
             // --- Comments ---
-            document.getElementById('lblTeacherComment').innerText = meta.teacher_comment || '--';
-            document.getElementById('lblTeacherName').innerText = meta.uploaded_by || '--';
+            document.getElementById('lblTeacherComment').innerText  = meta.teacher_comment || '--';
+            document.getElementById('lblTeacherName').innerText     = meta.uploaded_by || '--';
             document.getElementById('lblPrincipalComment').innerText = meta.principal_comment || '--';
 
             reportContent.style.display = 'block';
@@ -149,6 +194,7 @@ async function fetchResults(term = 'First Term') {
         emptyState.innerHTML = '<p style="color:var(--error);">Failed to load results. Please try again.</p>';
     }
 }
+
 
 // ─── RENDERING HELPER FUNCTIONS ──────────────────────────────
 
@@ -179,23 +225,81 @@ function renderCreche(metadata) {
     return html;
 }
 
-function renderPrenursery(results, metadata) {
-    let html = `<div class="section-header">ACADEMIC ASSESSMENT</div>`;
-    html += `<table class="data-table" style="margin-bottom:20px; width:100%;">
-        <thead><tr><th>SUBJECTS</th><th>ASSESSMENTS (100%)</th><th>GRADES</th></tr></thead><tbody>`;
+function renderPrenursery(results, metadata, calculatedPosition, numberOfStudents) {
+    let aggregateScore = 0;
+    const totalPossible = results.length * 100;
+    
+    results.forEach(row => {
+        aggregateScore += parseFloat(row.first_test) || 0;
+    });
+
+    let html = `
+    <div class="section-header">COGNITIVE RECORD</div>
+    <table class="data-table" style="margin-bottom:20px; width:100%;">
+        <thead>
+            <tr>
+                <th style="text-align:left;">SUBJECTS</th>
+                <th style="width:120px;">ASSESSMENTS</th>
+                <th style="width:80px;">GRADES</th>
+                <th style="text-align:left;">REMARK</th>
+            </tr>
+        </thead>
+        <tbody>`;
+    
     results.forEach(row => {
         const score = parseFloat(row.first_test) || 0;
         let grade = '-';
+        const remark = row.remark || '';
+        
         if (score >= 80) grade = 'A';
         else if (score >= 60) grade = 'B';
         else if (score >= 40) grade = 'C';
-        else if (score > 0) grade = 'D';
-        html += `<tr><td style="text-align:left; font-weight:bold;">${row.subject.toUpperCase()}</td><td>${score}</td><td><strong>${grade}</strong></td></tr>`;
+        else if (score > 0)  grade = 'D';
+        
+        html += `<tr>
+            <td style="text-align:left; font-weight:bold;">${row.subject.toUpperCase()}</td>
+            <td>${score}</td>
+            <td><strong>${grade}</strong></td>
+            <td style="text-align:left;">${remark}</td>
+        </tr>`;
     });
-    html += `</tbody></table>`;
-    html += renderBehaviors(metadata);
+    
+    html += `</tbody></table>
+    
+    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: bold; font-size:13px;">
+        <div>AGGREGATE SCORE: <strong>${aggregateScore}</strong> &nbsp;&nbsp; OUT OF: <strong>${totalPossible}</strong></div>
+    </div>
+    <div style="margin-bottom: 20px; font-weight: bold; font-size:13px;">
+        POSITION IN CLASS: <strong>${calculatedPosition}</strong>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px;">
+        <div>
+            ${renderBehaviors(metadata, true)}
+        </div>
+        <div>
+            <div class="behavior-header">GRADING SYSTEM</div>
+            <table class="behavior-table" style="font-size: 12px;">
+                <tbody>
+                    <tr><td style="text-align:center; font-weight:bold;">5</td><td style="text-align:left;">80-100% - A - Excellent</td></tr>
+                    <tr><td style="text-align:center; font-weight:bold;">4</td><td style="text-align:left;">60-77% - B - Good</td></tr>
+                    <tr><td style="text-align:center; font-weight:bold;">3</td><td style="text-align:left;">40-59% - C - Fair</td></tr>
+                    <tr><td style="text-align:center; font-weight:bold;">2</td><td style="text-align:left;">39 Below - D - Need improvement</td></tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 20px; line-height: 2; font-size:13px;">
+                <div><strong>STATUS:</strong> ${metadata.status || '--'}</div>
+                <div><strong>END OF TERM:</strong> ${metadata.end_of_term || '--'}</div>
+                <div><strong>NEXT TERM BEGINS:</strong> ${metadata.next_term_begins || '--'}</div>
+            </div>
+            <div style="margin-top:14px; font-weight:bold; text-decoration:underline; font-size:13px;">SCHOOL STAMP</div>
+        </div>
+    </div>`;
+
     return html;
 }
+
 
 function renderStandard(results, metadata, allData) {
     // Standard layout (Nursery 1-3, Basic 1-5, JSS 1-3)
@@ -276,7 +380,7 @@ function renderStandard(results, metadata, allData) {
     return html;
 }
 
-function renderBehaviors(metadata) {
+function renderBehaviors(metadata, isPrenursery = false) {
     let affTraitsObj = {};
     let psyTraitsObj = {};
     try {
@@ -289,25 +393,32 @@ function renderBehaviors(metadata) {
     const generateTraitRow = (traitName, scoreObj) => {
         const score = scoreObj[traitName] || 0;
         let cells = '';
-        for(let i=5; i>=1; i--) {
-            cells += `<td>${score === i ? '&#10003;' : ''}</td>`;
+        if (isPrenursery) {
+            // Image shows 2, 3, 4, 5
+            for(let i=2; i<=5; i++) {
+                cells += `<td>${score === i ? '&#10003;' : ''}</td>`;
+            }
+        } else {
+            for(let i=5; i>=1; i--) {
+                cells += `<td>${score === i ? '&#10003;' : ''}</td>`;
+            }
         }
         return `<tr><td style="text-align:left;">${traitName}</td>${cells}</tr>`;
     };
 
-    let html = `<div class="behavior-grid">`;
+    let html = `<div class="${isPrenursery ? '' : 'behavior-grid'}">`;
     if (Object.keys(affTraitsObj).length > 0) {
-        html += `<div>
+        html += `<div style="${isPrenursery ? 'margin-bottom:20px;' : ''}">
             <div class="behavior-header">Observation & Conduct (1-5)</div>
             <div class="behavior-scroll">
                 <table class="behavior-table">
-                    <thead><tr><th>Traits</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th></tr></thead>
+                    <thead><tr><th>Traits</th>${isPrenursery ? '<th>2</th><th>3</th><th>4</th><th>5</th>' : '<th>5</th><th>4</th><th>3</th><th>2</th><th>1</th>'}</tr></thead>
                     <tbody>${Object.keys(affTraitsObj).map(k => generateTraitRow(k, affTraitsObj)).join('')}</tbody>
                 </table>
             </div>
         </div>`;
     }
-    if (Object.keys(psyTraitsObj).length > 0) {
+    if (Object.keys(psyTraitsObj).length > 0 && !isPrenursery) {
         html += `<div>
             <div class="behavior-header">Physical Skills (1-5)</div>
             <div class="behavior-scroll">

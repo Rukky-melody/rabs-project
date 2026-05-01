@@ -111,6 +111,18 @@ function renderDynamicForm() {
                 <input type="text" id="session" placeholder="e.g., 2025/2026 Session">
             </div>
             <div class="form-group">
+                <label for="age">Age</label>
+                <input type="text" id="age" placeholder="e.g. 3 Years">
+            </div>
+            <div class="form-group">
+                <label for="numberInClass">Number in Class</label>
+                <input type="number" id="numberInClass" placeholder="20">
+            </div>
+            <div class="form-group">
+                <label for="position">Position in Class</label>
+                <input type="text" id="position" placeholder="e.g. 1st">
+            </div>
+            <div class="form-group">
                 <label for="timesSchoolOpened">Times School Opened</label>
                 <input type="number" id="timesSchoolOpened" placeholder="114">
             </div>
@@ -121,6 +133,18 @@ function renderDynamicForm() {
             <div class="form-group">
                 <label for="daysAbsent">Days Absent</label>
                 <input type="number" id="daysAbsent" placeholder="4">
+            </div>
+            <div class="form-group">
+                <label for="status">Status</label>
+                <input type="text" id="status" placeholder="e.g. Promoted to Nursery 1">
+            </div>
+            <div class="form-group">
+                <label for="endOfTerm">End of Term</label>
+                <input type="text" id="endOfTerm" placeholder="e.g. 15th April 2026">
+            </div>
+            <div class="form-group">
+                <label for="nextTermBegins">Next Term Begins</label>
+                <input type="text" id="nextTermBegins" placeholder="e.g. 5th May 2026">
             </div>
         </div>
     `;
@@ -202,6 +226,7 @@ function renderPreNurseryForm(config) {
                     <th style="padding: 10px;">Subjects</th>
                     <th style="padding: 10px; width: 150px;">Assessments (100)</th>
                     <th style="padding: 10px; width: 100px;">Grades</th>
+                    <th style="padding: 10px; width: 200px;">Remark</th>
                 </tr>
             </thead>
             <tbody id="subjectsBody">`;
@@ -217,6 +242,9 @@ function renderPreNurseryForm(config) {
                 </td>
                 <td style="padding: 10px;">
                     <strong class="grade-display">-</strong>
+                </td>
+                <td style="padding: 10px;">
+                    <input type="text" class="remark-input" placeholder="Remark" style="width: 100%; border: 1px solid var(--border); padding: 8px; border-radius: 4px; background: transparent; color: var(--text);">
                 </td>
             </tr>`;
     });
@@ -385,13 +413,15 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
 
             if (config.type === 'prenursery') {
                 const score = row.querySelector('.first-test-input').value;
+                const remark = row.querySelector('.remark-input')?.value || '';
                 if (score !== "") {
                     scores.push({
                         subject,
                         firstTest: parseFloat(score),
                         secondTest: 0,
                         caScore: 0,
-                        examScore: 0
+                        examScore: 0,
+                        remark: remark
                     });
                 }
             } else {
@@ -438,9 +468,15 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
         sex: studentSex,
         studentClass: studentClass,
         session: document.getElementById('session').value || '',
+        age: document.getElementById('age').value || '',
+        numberInClass: parseInt(document.getElementById('numberInClass').value) || 0,
+        position: document.getElementById('position').value || '',
         timesSchoolOpened: parseInt(document.getElementById('timesSchoolOpened').value) || 0,
         daysPresent: parseInt(document.getElementById('daysPresent').value) || 0,
         daysAbsent: parseInt(document.getElementById('daysAbsent').value) || 0,
+        status: document.getElementById('status').value || '',
+        endOfTerm: document.getElementById('endOfTerm').value || '',
+        nextTermBegins: document.getElementById('nextTermBegins').value || '',
         teacherComment: document.getElementById('teacherComment').value || '',
         principalComment: document.getElementById('principalComment').value || '',
         uploadedBy: currentStaffName,

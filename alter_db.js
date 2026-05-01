@@ -96,7 +96,23 @@ async function alterTable() {
         if (e.code === 'ER_DUP_FIELDNAME') console.log('creche_evaluations already exists in report_metadata');
         else console.error('Error adding creche_evaluations:', e);
     }
-    
+    // ── CRITICAL FIX: Remove NOT NULL constraint from legacy columns ──────────
+    // ca_score and exam_score were originally NOT NULL, but Pre-Nursery/Creche
+    // classes don't use these columns. ALTER to allow NULL or default 0.
+    try {
+        await db.query('ALTER TABLE results MODIFY COLUMN ca_score DECIMAL(5,2) NOT NULL DEFAULT 0');
+        console.log('Fixed: ca_score now has DEFAULT 0 (not null safe)');
+    } catch (e) {
+        console.error('Error modifying ca_score:', e.message);
+    }
+
+    try {
+        await db.query('ALTER TABLE results MODIFY COLUMN exam_score DECIMAL(5,2) NOT NULL DEFAULT 0');
+        console.log('Fixed: exam_score now has DEFAULT 0 (not null safe)');
+    } catch (e) {
+        console.error('Error modifying exam_score:', e.message);
+    }
+
     process.exit(0);
 }
 
