@@ -159,6 +159,14 @@ function renderDynamicForm() {
 
     container.innerHTML = html;
 
+    // ── Prevent scroll wheel from accidentally changing number inputs ──
+    // This fixes the bug where typing 50 then hovering/scrolling changes it to 49
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+        input.addEventListener('wheel', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+    });
+
     // Attach event listeners
     if (config.type === 'standard') {
         document.querySelectorAll('.score-input').forEach(input => {
@@ -169,7 +177,10 @@ function renderDynamicForm() {
             tbody.insertAdjacentHTML('beforeend', getStandardRowHTML(''));
             // Re-attach listeners to new row
             const newRow = tbody.lastElementChild;
-            newRow.querySelectorAll('.score-input').forEach(input => input.addEventListener('input', calculateStandardTermAverage));
+            newRow.querySelectorAll('.score-input').forEach(input => {
+                input.addEventListener('input', calculateStandardTermAverage);
+                input.addEventListener('wheel', (e) => e.preventDefault(), { passive: false });
+            });
             newRow.querySelector('.remove-row-btn').addEventListener('click', (e) => {
                 e.target.closest('tr').remove();
                 calculateStandardTermAverage();
@@ -369,16 +380,32 @@ function calculateStandardTermAverage() {
     if (termAvgEl) termAvgEl.textContent = avg + "%";
 }
 
+// Pre-Nursery grading system (per school's scale)
+function getPrenurseryRemark(score) {
+    if (score >= 80) return { grade: 'A', remark: 'EXCELLENT' };
+    if (score >= 65) return { grade: 'B', remark: 'VERY GOOD' };
+    if (score >= 59) return { grade: 'C', remark: 'CREDIT' };
+    if (score >= 45) return { grade: 'D', remark: 'PASS' };
+    if (score >  0)  return { grade: 'F', remark: 'FAIL' };
+    return { grade: '-', remark: '' };
+}
+
 function calculatePrenurseryGrade(e) {
     const row = e.target.closest('tr');
-    const score = parseFloat(row.querySelector('.first-test-input').value) || 0;
-    const gradeEl = row.querySelector('.grade-display');
-    
-    if (score >= 80) gradeEl.textContent = "A";
-    else if (score >= 60) gradeEl.textContent = "B";
-    else if (score >= 40) gradeEl.textContent = "C";
-    else if (score > 0) gradeEl.textContent = "D";
-    else gradeEl.textContent = "-";
+    const score = parseFloat(row.querySelector('.first-test-input').value);
+    const gradeEl   = row.querySelector('.grade-display');
+    const remarkInput = row.querySelector('.remark-input');
+
+    if (isNaN(score) || row.querySelector('.first-test-input').value === '') {
+        gradeEl.textContent = '-';
+        if (remarkInput) remarkInput.value = '';
+        return;
+    }
+
+    const { grade, remark } = getPrenurseryRemark(score);
+    gradeEl.textContent = grade;
+    // Auto-fill remark (teacher can still override manually)
+    if (remarkInput) remarkInput.value = remark;
 }
 
 // ─── SUBMISSION ─────────────────────────────────────────────

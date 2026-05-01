@@ -251,10 +251,11 @@ function renderPrenursery(results, metadata, calculatedPosition, numberOfStudent
         let grade = '-';
         const remark = row.remark || '';
         
-        if (score >= 80) grade = 'A';
-        else if (score >= 60) grade = 'B';
-        else if (score >= 40) grade = 'C';
-        else if (score > 0)  grade = 'D';
+        if (score >= 80)      grade = 'A';
+        else if (score >= 65) grade = 'B';
+        else if (score >= 59) grade = 'C';
+        else if (score >= 45) grade = 'D';
+        else if (score > 0)   grade = 'F';
         
         html += `<tr>
             <td style="text-align:left; font-weight:bold;">${row.subject.toUpperCase()}</td>
