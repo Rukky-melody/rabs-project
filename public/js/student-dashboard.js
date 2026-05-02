@@ -168,6 +168,37 @@ async function fetchResults(term = 'First Term') {
                 document.getElementById('nrNumberInClass').innerText = numberOfStudents;
                 document.getElementById('nrLastTermComm').innerText  = prevTermName ? lastTermAgg : '--';
 
+            } else if (className.startsWith('PRIMARY')) {
+                // ── Primary info block ──
+                if (standardBlock)   standardBlock.style.display   = 'none';
+                if (prenurseryBlock) prenurseryBlock.style.display = 'none';
+                const nurseryBlock = document.getElementById('nurseryInfoBlock');
+                if (nurseryBlock)    nurseryBlock.style.display    = 'none';
+                const primaryBlock = document.getElementById('primaryInfoBlock');
+                if (primaryBlock) primaryBlock.style.display = 'block';
+
+                if (reportTitle) reportTitle.innerText = 'PRIMARY TERMLY RESULT';
+                if (principalLabel) principalLabel.innerText = 'HEAD TEACHER\'S COMMENT:';
+
+                document.getElementById('prName').innerText         = studentName || '--';
+                document.getElementById('prClass').innerText        = meta.class_name || '--';
+                document.getElementById('prAge').innerText          = meta.age || '--';
+                document.getElementById('prSession').innerText      = meta.session || '--';
+                document.getElementById('prTerm').innerText         = term;
+                document.getElementById('prSchoolOpened').innerText = meta.times_school_opened || '--';
+                document.getElementById('prTimePresent').innerText  = meta.days_present || '--';
+                document.getElementById('prTimeAbsent').innerText   = meta.days_absent || '--';
+                document.getElementById('prNumberInClass').innerText = numberOfStudents;
+                document.getElementById('prPosition').innerText     = calculatedPosition;
+                document.getElementById('prStatus').innerText       = meta.status || '--';
+
+                let aggregateScore = 0;
+                termResults.forEach(r => {
+                    aggregateScore += (parseFloat(r.first_test)||0) + (parseFloat(r.second_test)||0) + (parseFloat(r.exam_score)||0);
+                });
+                document.getElementById('prAggregate').innerText = aggregateScore;
+                document.getElementById('prOutOf').innerText     = termResults.length * 100;
+
             } else {
                 // Show standard info block
                 if (prenurseryBlock) prenurseryBlock.style.display = 'none';
@@ -201,6 +232,9 @@ async function fetchResults(term = 'First Term') {
             } else if (className.startsWith('NURSERY')) {
                 const termSubjectRanks = (data.subjectRankMap || {})[term] || {};
                 container.innerHTML = renderNursery(termResults, meta, data, calculatedPosition, numberOfStudents, termSubjectRanks);
+            } else if (className.startsWith('PRIMARY')) {
+                const termSubjectRanks = (data.subjectRankMap || {})[term] || {};
+                container.innerHTML = renderPrimary(termResults, meta, data, calculatedPosition, numberOfStudents, termSubjectRanks);
             } else {
                 container.innerHTML = renderStandard(termResults, meta, data);
             }
@@ -587,6 +621,121 @@ function renderBehaviors(metadata, isPrenursery = false) {
     html += `</div>`;
     return html;
 }
+
+function renderPrimary(results, metadata, allData, calculatedPosition, numberOfStudents, subjectRanks) {
+    const termName   = results[0]?.term || '';
+    const prevTermName = termName === 'Second Term' ? 'First Term' : termName === 'Third Term' ? 'Second Term' : null;
+    const prevResults  = prevTermName ? (allData.results || []).filter(r => r.term === prevTermName) : [];
+    const prevMap = {};
+    prevResults.forEach(r => {
+        prevMap[r.subject] = (parseFloat(r.first_test)||0) + (parseFloat(r.second_test)||0) + (parseFloat(r.exam_score)||0);
+    });
+
+    const maxT1 = 20, maxT2 = 20, maxExam = 60, maxTotal = 100;
+    
+    let cogRows = `<tr style="background:#f0f0f0; font-weight:bold;">
+        <td style="text-align:left; font-style:italic;">Marks Obtainable</td>
+        <td>${maxT1}</td><td>${maxT2}</td><td>${maxExam}</td><td>${maxTotal}</td>
+        <td>--</td><td>--</td><td>--</td><td>--</td><td>--</td>
+    </tr>`;
+
+    results.forEach(row => {
+        const t1   = parseFloat(row.first_test)  || 0;
+        const t2   = parseFloat(row.second_test) || 0;
+        const exam = parseFloat(row.exam_score)  || 0;
+        const total = t1 + t2 + exam;
+        
+        let grade = 'E';
+        if (total >= 70) grade = 'A';
+        else if (total >= 60) grade = 'B';
+        else if (total >= 50) grade = 'C';
+        else if (total >= 40) grade = 'D';
+
+        const lastComm = prevMap[row.subject] !== undefined ? prevMap[row.subject] : '--';
+        const subPos   = subjectRanks[row.subject] || '--';
+        const remark   = row.remark || '';
+        
+        cogRows += `<tr>
+            <td style="text-align:left; font-weight:bold;">${row.subject.toUpperCase()}</td>
+            <td>${t1}</td><td>${t2}</td><td>${exam}</td><td><strong>${total}</strong></td>
+            <td>${lastComm}</td><td>--</td><td><strong>${grade}</strong></td><td>${subPos}</td><td>${remark}</td>
+        </tr>`;
+    });
+
+    let affTraitsObj = {}, psyTraitsObj = {};
+    try {
+        affTraitsObj = typeof metadata.affective_traits === 'string' ? JSON.parse(metadata.affective_traits) : (metadata.affective_traits || {});
+        psyTraitsObj = typeof metadata.psychomotor_traits === 'string' ? JSON.parse(metadata.psychomotor_traits) : (metadata.psychomotor_traits || {});
+    } catch(e) {}
+
+    const traitRow = (name, score, cols) => {
+        let cells = '';
+        for (let i = 1; i <= cols; i++) cells += `<td>${score === i ? '&#10003;' : ''}</td>`;
+        return `<tr><td style="text-align:left; font-size:11px;">${name}</td>${cells}</tr>`;
+    };
+
+    let obsRows = Object.entries(affTraitsObj).map(([k,v]) => traitRow(k, v, 5)).join('');
+    let phyRows = Object.entries(psyTraitsObj).map(([k,v]) => traitRow(k, v, 5)).join('');
+
+    const html = \`
+    <div style="display:grid; grid-template-columns:1.6fr 1fr; gap:8px; margin-bottom:16px;">
+        <div style="overflow-x:auto;">
+            <table class="data-table" style="font-size:11px; min-width:400px;">
+                <thead>
+                    <tr>
+                        <th rowspan="2" style="text-align:left; min-width:120px; font-size:13px;">COGNITIVE RECORD</th>
+                        <th>1st<br>Test</th><th>2nd<br>Test</th><th>Term's<br>Exam</th><th>Total</th>
+                        <th>Last<br>Term<br>Comm</th><th>Total<br>Average</th><th>Grade</th><th>Subject<br>Position</th><th>Teacher's<br>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>\${cogRows}</tbody>
+            </table>
+        </div>
+        <div>
+            \${obsRows ? \`
+            <table class="behavior-table" style="font-size:11px; width:100%;">
+                <thead><tr><th style="text-align:center; font-size:11px;">OBSERVATION<br>AND CONDUCT</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead>
+                <tbody>\${obsRows}</tbody>
+            </table>\` : ''}
+            \${phyRows ? \`
+            <table class="behavior-table" style="font-size:11px; width:100%; margin-top:8px;">
+                <thead><tr><th style="text-align:center; font-size:11px;">PERFORMANCE IN<br>PHYSICAL SKILLS</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead>
+                <tbody>\${phyRows}</tbody>
+            </table>\` : ''}
+            
+            <table class="behavior-table" style="font-size:11px; width:100%; margin-top:8px;">
+                <thead><tr><th colspan="3" style="text-align:left; font-size:12px;">KEY TO RATINGS</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>5.</strong> Excellent in trait</td><td>70 & Above</td><td><strong>A</strong></td></tr>
+                    <tr><td><strong>4.</strong> Good in trait</td><td>60-69</td><td><strong>B</strong></td></tr>
+                    <tr><td><strong>3.</strong> Satisfactory in trait</td><td>50-59</td><td><strong>C</strong></td></tr>
+                    <tr><td><strong>2.</strong> Fair in trait</td><td>40-49</td><td><strong>D</strong></td></tr>
+                    <tr><td><strong>1.</strong> Poor in trait</td><td>0-39</td><td><strong>E</strong></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div style="margin-top:16px;">
+        <table class="data-table" style="font-size:12px; width:45%; text-align:left;">
+            <tbody>
+                <tr><td style="text-align:left; font-weight:bold; width:55%;">Class Teacher Comment</td><td style="text-align:left;">\${metadata.teacher_comment || ''}</td></tr>
+                <tr><td style="text-align:left; font-weight:bold;">Head Teacher Comment</td><td style="text-align:left;">\${metadata.principal_comment || ''}</td></tr>
+                <tr><td style="text-align:left; font-weight:bold;">Areas Improvement is Needed</td><td style="text-align:left;">\${metadata.area_improvement || ''}</td></tr>
+                <tr><td style="text-align:left; font-weight:bold;">End of Term</td><td style="text-align:left;">\${metadata.end_of_term || ''}</td></tr>
+                <tr><td style="text-align:left; font-weight:bold;">Next Term Begins</td><td style="text-align:left;">\${metadata.next_term_begins || ''}</td></tr>
+            </tbody>
+        </table>
+        
+        <div style="display:flex; justify-content:flex-end; margin-top:20px;">
+            <div style="border-top:1px solid #000; width:250px; text-align:center; font-size:14px; padding-top:4px;">
+                Head Teacher's Signature
+            </div>
+        </div>
+    </div>\`;
+    return html;
+}
+
 
 document.getElementById('termSelector').addEventListener('change', (e) => {
     fetchResults(e.target.value);
