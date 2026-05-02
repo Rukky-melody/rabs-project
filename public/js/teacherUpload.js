@@ -63,7 +63,7 @@ const classConfigs = {
     },
     'Nursery 1-3': {
         type: 'standard',
-        subjects: ["ENGLISH LANGUAGE", "MATHEMATICS", "BASIC SCIENCE", "SOCIAL HABIT", "HEALTH HABIT", "AGRICULTURAL SCIENCE", "QUANTITATIVE REASONING", "VERBAL REASONING", "CHRISTIAN RELIGIOUS", "HAND WRITING", "PHONICS", "CULTURAL AND CREATIVE ART", "COMPUTER STUDIES"],
+        subjects: ["ENGLISH LANGUAGE", "MATHEMATICS", "BASIC SCIENCE", "SOCIAL HABIT", "HEALTH HABIT", "AGRICULTURAL SCIENCE", "QUANTITATIVE REASONING", "VERBAL REASONING", "CHRISTIAN RELIGIOUS STUDIES", "HANDWRITING", "PHONICS", "CULTURAL AND CREATIVE ART", "COMPUTER STUDIES"],
         observationTraits: ["Honesty", "Leadership", "Punctuality", "Cleanliness", "Attentiveness", "Maturity", "Politeness", "Emotional Balance"],
         physicalTraits: ["Handwriting", "Handwork", "Drama", "Sports", "Ball Game", "Track Event", "Throws", "Jumps"]
     },
@@ -369,15 +369,43 @@ function calculateStandardTermAverage() {
     let count = 0;
     
     rows.forEach(row => {
-        const t1 = parseFloat(row.querySelector('.first-test-input')?.value) || 0;
-        const t2 = parseFloat(row.querySelector('.second-test-input')?.value) || 0;
-        const exam = parseFloat(row.querySelector('.exam-input')?.value) || 0;
+        const t1Str = row.querySelector('.first-test-input')?.value;
+        const t2Str = row.querySelector('.second-test-input')?.value;
+        const examStr = row.querySelector('.exam-input')?.value;
+        
+        const t1 = parseFloat(t1Str) || 0;
+        const t2 = parseFloat(t2Str) || 0;
+        const exam = parseFloat(examStr) || 0;
         const total = t1 + t2 + exam;
         
         const totalEl = row.querySelector('.total-score-display');
         if (totalEl) totalEl.textContent = total;
         
-        if (t1 > 0 || t2 > 0 || exam > 0) {
+        // Auto-generate remark
+        const remarkInput = row.querySelector('.remark-input');
+        if (remarkInput) {
+            if (t1Str !== "" || t2Str !== "" || examStr !== "") {
+                const cls = (assignedClass || '').toUpperCase();
+                if (cls.startsWith('NURSERY')) {
+                    if (total >= 70) remarkInput.value = 'Excellent';
+                    else if (total >= 60) remarkInput.value = 'Good';
+                    else if (total >= 50) remarkInput.value = 'Satisfactory';
+                    else if (total >= 40) remarkInput.value = 'Fair';
+                    else remarkInput.value = 'Poor';
+                } else {
+                    if (total >= 80) remarkInput.value = 'EXCELLENT';
+                    else if (total >= 70) remarkInput.value = 'VERY GOOD';
+                    else if (total >= 60) remarkInput.value = 'GOOD';
+                    else if (total >= 50) remarkInput.value = 'FAIR';
+                    else if (total >= 40) remarkInput.value = 'POOR';
+                    else remarkInput.value = 'VERY POOR';
+                }
+            } else {
+                remarkInput.value = '';
+            }
+        }
+        
+        if (t1Str !== "" || t2Str !== "" || examStr !== "") {
             totalSum += total;
             count++;
         }
