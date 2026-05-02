@@ -677,7 +677,7 @@ function renderPrimary(results, metadata, allData, calculatedPosition, numberOfS
     let obsRows = Object.entries(affTraitsObj).map(([k,v]) => traitRow(k, v, 5)).join('');
     let phyRows = Object.entries(psyTraitsObj).map(([k,v]) => traitRow(k, v, 5)).join('');
 
-    const html = \`
+    const html = `
     <div style="display:grid; grid-template-columns:1.6fr 1fr; gap:8px; margin-bottom:16px;">
         <div style="overflow-x:auto;">
             <table class="data-table" style="font-size:11px; min-width:400px;">
@@ -688,20 +688,20 @@ function renderPrimary(results, metadata, allData, calculatedPosition, numberOfS
                         <th>Last<br>Term<br>Comm</th><th>Total<br>Average</th><th>Grade</th><th>Subject<br>Position</th><th>Teacher's<br>Remarks</th>
                     </tr>
                 </thead>
-                <tbody>\${cogRows}</tbody>
+                <tbody>${cogRows}</tbody>
             </table>
         </div>
         <div>
-            \${obsRows ? \`
+            ${obsRows ? `
             <table class="behavior-table" style="font-size:11px; width:100%;">
                 <thead><tr><th style="text-align:center; font-size:11px;">OBSERVATION<br>AND CONDUCT</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead>
-                <tbody>\${obsRows}</tbody>
-            </table>\` : ''}
-            \${phyRows ? \`
+                <tbody>${obsRows}</tbody>
+            </table>` : ''}
+            ${phyRows ? `
             <table class="behavior-table" style="font-size:11px; width:100%; margin-top:8px;">
                 <thead><tr><th style="text-align:center; font-size:11px;">PERFORMANCE IN<br>PHYSICAL SKILLS</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead>
-                <tbody>\${phyRows}</tbody>
-            </table>\` : ''}
+                <tbody>${phyRows}</tbody>
+            </table>` : ''}
             
             <table class="behavior-table" style="font-size:11px; width:100%; margin-top:8px;">
                 <thead><tr><th colspan="3" style="text-align:left; font-size:12px;">KEY TO RATINGS</th></tr></thead>
@@ -719,11 +719,11 @@ function renderPrimary(results, metadata, allData, calculatedPosition, numberOfS
     <div style="margin-top:16px;">
         <table class="data-table" style="font-size:12px; width:45%; text-align:left;">
             <tbody>
-                <tr><td style="text-align:left; font-weight:bold; width:55%;">Class Teacher Comment</td><td style="text-align:left;">\${metadata.teacher_comment || ''}</td></tr>
-                <tr><td style="text-align:left; font-weight:bold;">Head Teacher Comment</td><td style="text-align:left;">\${metadata.principal_comment || ''}</td></tr>
-                <tr><td style="text-align:left; font-weight:bold;">Areas Improvement is Needed</td><td style="text-align:left;">\${metadata.area_improvement || ''}</td></tr>
-                <tr><td style="text-align:left; font-weight:bold;">End of Term</td><td style="text-align:left;">\${metadata.end_of_term || ''}</td></tr>
-                <tr><td style="text-align:left; font-weight:bold;">Next Term Begins</td><td style="text-align:left;">\${metadata.next_term_begins || ''}</td></tr>
+                <tr><td style="text-align:left; font-weight:bold; width:55%;">Class Teacher Comment</td><td style="text-align:left;">${metadata.teacher_comment || ''}</td></tr>
+                <tr><td style="text-align:left; font-weight:bold;">Head Teacher Comment</td><td style="text-align:left;">${metadata.principal_comment || ''}</td></tr>
+                <tr><td style="text-align:left; font-weight:bold;">Areas Improvement is Needed</td><td style="text-align:left;">${metadata.area_improvement || ''}</td></tr>
+                <tr><td style="text-align:left; font-weight:bold;">End of Term</td><td style="text-align:left;">${metadata.end_of_term || ''}</td></tr>
+                <tr><td style="text-align:left; font-weight:bold;">Next Term Begins</td><td style="text-align:left;">${metadata.next_term_begins || ''}</td></tr>
             </tbody>
         </table>
         
@@ -732,7 +732,7 @@ function renderPrimary(results, metadata, allData, calculatedPosition, numberOfS
                 Head Teacher's Signature
             </div>
         </div>
-    </div>\`;
+    </div>`;
     return html;
 }
 
