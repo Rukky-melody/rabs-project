@@ -199,6 +199,40 @@ async function fetchResults(term = 'First Term') {
                 document.getElementById('prAggregate').innerText = aggregateScore;
                 document.getElementById('prOutOf').innerText     = termResults.length * 100;
 
+            } else if (className.startsWith('JSS') || className.startsWith('JUNIOR SECONDARY')) {
+                // ── JSS info block ──
+                if (standardBlock)   standardBlock.style.display   = 'none';
+                if (prenurseryBlock) prenurseryBlock.style.display = 'none';
+                const nurseryBlock = document.getElementById('nurseryInfoBlock');
+                if (nurseryBlock)    nurseryBlock.style.display    = 'none';
+                const primaryBlock = document.getElementById('primaryInfoBlock');
+                if (primaryBlock)    primaryBlock.style.display    = 'none';
+                const jssBlock = document.getElementById('jssInfoBlock');
+                if (jssBlock) jssBlock.style.display = 'block';
+
+                if (reportTitle) reportTitle.innerText = 'JUNIOR SECONDARY TERMLY RESULT';
+                if (principalLabel) principalLabel.innerText = 'HEAD TEACHER\'S REMARK:';
+
+                document.getElementById('jssName').innerText         = studentName || '--';
+                // Try to find admission number from meta or use studentId
+                document.getElementById('jssAdminNo').innerText      = meta.admission_number || studentId || '--';
+                document.getElementById('jssNumberInClass').innerText = numberOfStudents;
+                document.getElementById('jssClass').innerText        = meta.class_name || '--';
+                document.getElementById('jssAge').innerText          = meta.age || '--';
+                document.getElementById('jssSession').innerText      = meta.session || '--';
+                document.getElementById('jssTerm').innerText         = term;
+                document.getElementById('jssSchoolOpened').innerText = meta.times_school_opened || '--';
+                document.getElementById('jssTimePresent').innerText  = meta.days_present || '--';
+                document.getElementById('jssTimeAbsent').innerText   = meta.days_absent || '--';
+                document.getElementById('jssPosition').innerText     = calculatedPosition;
+
+                let aggregateScore = 0;
+                termResults.forEach(r => {
+                    aggregateScore += (parseFloat(r.first_test)||0) + (parseFloat(r.second_test)||0) + (parseFloat(r.exam_score)||0);
+                });
+                document.getElementById('jssAggregate').innerText = aggregateScore;
+                document.getElementById('jssOutOf').innerText     = termResults.length * 100;
+
             } else {
                 // Show standard info block
                 if (prenurseryBlock) prenurseryBlock.style.display = 'none';
@@ -235,6 +269,9 @@ async function fetchResults(term = 'First Term') {
             } else if (className.startsWith('PRIMARY')) {
                 const termSubjectRanks = (data.subjectRankMap || {})[term] || {};
                 container.innerHTML = renderPrimary(termResults, meta, data, calculatedPosition, numberOfStudents, termSubjectRanks);
+            } else if (className.startsWith('JSS') || className.startsWith('JUNIOR SECONDARY')) {
+                const termSubjectRanks = (data.subjectRankMap || {})[term] || {};
+                container.innerHTML = renderJss(termResults, meta, data, calculatedPosition, numberOfStudents, termSubjectRanks);
             } else {
                 container.innerHTML = renderStandard(termResults, meta, data);
             }
@@ -736,6 +773,116 @@ function renderPrimary(results, metadata, allData, calculatedPosition, numberOfS
     return html;
 }
 
+function renderJss(results, metadata, allData, calculatedPosition, numberOfStudents, subjectRanks) {
+    const termName   = results[0]?.term || '';
+    const prevTermName = termName === 'Second Term' ? 'First Term' : termName === 'Third Term' ? 'Second Term' : null;
+    const prevResults  = prevTermName ? (allData.results || []).filter(r => r.term === prevTermName) : [];
+    const prevMap = {};
+    prevResults.forEach(r => {
+        prevMap[r.subject] = (parseFloat(r.first_test)||0) + (parseFloat(r.second_test)||0) + (parseFloat(r.exam_score)||0);
+    });
+
+    const maxT1 = 20, maxT2 = 20, maxExam = 60, maxTotal = 100;
+    
+    let cogRows = `<tr style="background:#f0f0f0; font-weight:bold;">
+        <td style="text-align:left; font-style:italic;">Marks Obtainable</td>
+        <td>${maxT1}</td><td>${maxT2}</td><td>${maxExam}</td><td>${maxTotal}</td>
+        <td>--</td><td>--</td><td>--</td><td>--</td><td>--</td>
+    </tr>`;
+
+    results.forEach(row => {
+        const t1   = parseFloat(row.first_test)  || 0;
+        const t2   = parseFloat(row.second_test) || 0;
+        const exam = parseFloat(row.exam_score)  || 0;
+        const total = t1 + t2 + exam;
+        
+        let grade = 'F9';
+        if (total >= 90) grade = 'A1';
+        else if (total >= 80) grade = 'A2';
+        else if (total >= 70) grade = 'B2';
+        else if (total >= 60) grade = 'B3';
+        else if (total >= 50) grade = 'C4';
+        else if (total >= 40) grade = 'D';
+
+        const lastComm = prevMap[row.subject] !== undefined ? prevMap[row.subject] : '--';
+        const subPos   = subjectRanks[row.subject] || '--';
+        const remark   = row.remark || '';
+        
+        cogRows += `<tr>
+            <td style="text-align:left; font-weight:bold;">${row.subject.toUpperCase()}</td>
+            <td>${t1}</td><td>${t2}</td><td>${exam}</td><td><strong>${total}</strong></td>
+            <td>${lastComm}</td><td>--</td><td><strong>${grade}</strong></td><td>${subPos}</td><td>${remark}</td>
+        </tr>`;
+    });
+
+    let affTraitsObj = {};
+    try {
+        affTraitsObj = typeof metadata.affective_traits === 'string' ? JSON.parse(metadata.affective_traits) : (metadata.affective_traits || {});
+    } catch(e) {}
+
+    const traitRow = (name, score, cols) => {
+        let cells = '';
+        for (let i = 1; i <= cols; i++) cells += `<td>${score === i ? '&#10003;' : ''}</td>`;
+        return `<tr><td style="text-align:left; font-size:11px;">${name}</td>${cells}</tr>`;
+    };
+
+    let obsRows = Object.entries(affTraitsObj).map(([k,v]) => traitRow(k, v, 5)).join('');
+
+    const html = `
+    <div style="display:grid; grid-template-columns:1.6fr 1fr; gap:8px; margin-bottom:16px;">
+        <div style="overflow-x:auto;">
+            <table class="data-table" style="font-size:11px; min-width:400px;">
+                <thead>
+                    <tr>
+                        <th rowspan="2" style="text-align:left; min-width:120px; font-size:13px;">COGNITIVE RECORD</th>
+                        <th>1st<br>Test</th><th>2nd<br>Test</th><th>Term's<br>Exam</th><th>Total</th>
+                        <th>Last<br>Term<br>Comm</th><th>Total<br>Average</th><th>Grade</th><th>Subject<br>Position</th><th>Teacher's<br>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>${cogRows}</tbody>
+            </table>
+        </div>
+        <div>
+            ${obsRows ? `
+            <table class="behavior-table" style="font-size:11px; width:100%;">
+                <thead><tr><th style="text-align:center; font-size:11px;">OBSERVATION<br>AND CONDUCT</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead>
+                <tbody>${obsRows}</tbody>
+            </table>` : ''}
+            
+            <table class="behavior-table" style="font-size:11px; width:100%; margin-top:8px;">
+                <thead><tr><th colspan="3" style="text-align:center; font-size:12px;">GRADING SYSTEM</th></tr></thead>
+                <tbody>
+                    <tr><td style="text-align:left;">90-100%</td><td><strong>A1</strong></td><td>Excellent</td></tr>
+                    <tr><td style="text-align:left;">80-89%</td><td><strong>A2</strong></td><td>Excellent</td></tr>
+                    <tr><td style="text-align:left;">70-79%</td><td><strong>B2</strong></td><td>Very Good</td></tr>
+                    <tr><td style="text-align:left;">60-69%</td><td><strong>B3</strong></td><td>Good</td></tr>
+                    <tr><td style="text-align:left;">50-59%</td><td><strong>C4</strong></td><td>Average</td></tr>
+                    <tr><td style="text-align:left;">40-49%</td><td><strong>D</strong></td><td>Pass</td></tr>
+                    <tr><td style="text-align:left;">Below 40%</td><td><strong>F9</strong></td><td>Fail</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div style="margin-top:16px;">
+        <table class="data-table" style="font-size:12px; width:55%; text-align:left;">
+            <tbody>
+                <tr><td style="text-align:left; font-weight:bold; width:45%;">CLASS TEACHER'S REMARK:</td><td style="text-align:left;">${metadata.teacher_comment || ''}</td></tr>
+                <tr><td style="text-align:left; font-weight:bold;">HEAD TEACHER'S REMARK:</td><td style="text-align:left;">${metadata.principal_comment || ''}</td></tr>
+                <tr><td style="text-align:left; font-weight:bold;">FOCAL AREA TO IMPROVE ON:</td><td style="text-align:left;">${metadata.area_improvement || ''}</td></tr>
+                <tr><td style="text-align:left; font-weight:bold;">STATUS:</td><td style="text-align:left;">${metadata.status || ''}</td></tr>
+                <tr><td style="text-align:left; font-weight:bold;">END OF TERM: ${metadata.end_of_term || ''}</td><td style="text-align:left; font-weight:bold;">NEXT TERM: ${metadata.next_term_begins || ''}</td></tr>
+            </tbody>
+        </table>
+        
+        <div style="display:flex; justify-content:flex-end; margin-top:20px;">
+            <div style="border-top:1px solid #000; width:250px; text-align:center; font-size:14px; padding-top:4px;">
+                Head Teacher's Signature
+            </div>
+        </div>
+    </div>`;
+    return html;
+}
 
 document.getElementById('termSelector').addEventListener('change', (e) => {
     fetchResults(e.target.value);

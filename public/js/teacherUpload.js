@@ -386,12 +386,20 @@ function calculateStandardTermAverage() {
         if (remarkInput) {
             if (t1Str !== "" || t2Str !== "" || examStr !== "") {
                 const cls = (assignedClass || '').toUpperCase();
-                if (cls.startsWith('NURSERY')) {
+                if (cls.startsWith('NURSERY') || cls.startsWith('PRIMARY') || cls.startsWith('BASIC')) {
                     if (total >= 70) remarkInput.value = 'Excellent';
                     else if (total >= 60) remarkInput.value = 'Good';
                     else if (total >= 50) remarkInput.value = 'Satisfactory';
                     else if (total >= 40) remarkInput.value = 'Fair';
                     else remarkInput.value = 'Poor';
+                } else if (cls.startsWith('JSS') || cls.startsWith('JUNIOR SECONDARY')) {
+                    if (total >= 90) remarkInput.value = 'Excellent';
+                    else if (total >= 80) remarkInput.value = 'Excellent';
+                    else if (total >= 70) remarkInput.value = 'Very Good';
+                    else if (total >= 60) remarkInput.value = 'Good';
+                    else if (total >= 50) remarkInput.value = 'Average';
+                    else if (total >= 40) remarkInput.value = 'Pass';
+                    else remarkInput.value = 'Fail';
                 } else {
                     if (total >= 80) remarkInput.value = 'EXCELLENT';
                     else if (total >= 70) remarkInput.value = 'VERY GOOD';
