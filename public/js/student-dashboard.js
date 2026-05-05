@@ -520,7 +520,10 @@ function renderNursery(results, metadata, allData, calculatedPosition, numberOfS
                     <tr><td><strong>1</strong></td><td style="text-align:left;">Poor in trait</td><td>0-39</td><td>F</td></tr>
                 </tbody>
             </table>
-            <div style="margin-top:16px; font-weight:bold; text-decoration:underline; font-size:13px;">SCHOOL STAMP</div>
+            <div style="margin-top:16px; position:relative; display:inline-block;">
+                <img src="../images/headmaster-signature.png" alt="" style="position:absolute; bottom:5px; left:10px; height:50px; pointer-events:none;">
+                <div style="font-weight:bold; text-decoration:underline; font-size:13px; position:relative; z-index:1;">SCHOOL STAMP</div>
+            </div>
         </div>
     </div>`;
     return html;
@@ -765,8 +768,11 @@ function renderPrimary(results, metadata, allData, calculatedPosition, numberOfS
         </table>
         
         <div style="display:flex; justify-content:flex-end; margin-top:20px;">
-            <div style="border-top:1px solid #000; width:250px; text-align:center; font-size:14px; padding-top:4px;">
-                Head Teacher's Signature
+            <div style="position:relative; width:250px;">
+                <img src="../images/headmaster-signature.png" alt="" style="position:absolute; bottom:15px; left:50%; transform:translateX(-50%); height:60px; pointer-events:none;">
+                <div style="border-top:1px solid #000; text-align:center; font-size:14px; padding-top:4px; position:relative; z-index:1;">
+                    Head Teacher's Signature
+                </div>
             </div>
         </div>
     </div>`;
@@ -876,8 +882,11 @@ function renderJss(results, metadata, allData, calculatedPosition, numberOfStude
         </table>
         
         <div style="display:flex; justify-content:flex-end; margin-top:20px;">
-            <div style="border-top:1px solid #000; width:250px; text-align:center; font-size:14px; padding-top:4px;">
-                Head Teacher's Signature
+            <div style="position:relative; width:250px;">
+                <img src="../images/headmaster-signature.png" alt="" style="position:absolute; bottom:15px; left:50%; transform:translateX(-50%); height:60px; pointer-events:none;">
+                <div style="border-top:1px solid #000; text-align:center; font-size:14px; padding-top:4px; position:relative; z-index:1;">
+                    Head Teacher's Signature
+                </div>
             </div>
         </div>
     </div>`;
