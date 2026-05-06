@@ -247,13 +247,70 @@
 
         /* ── PRINT ── */
         @media print {
-            body { background: #fff; padding: 0; }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            @page { size: A4 portrait; margin: 10mm; }
+            html, body { width: 100%; margin: 0; padding: 0; background: #fff; }
             .no-print { display: none !important; }
-            .report-container { box-shadow: none; padding: 10px; width: 100%; }
-            .table-scroll, .behavior-scroll { overflow: visible; }
-            .data-table, .behavior-table { min-width: unset; }
-            .behavior-grid { grid-template-columns: 1fr 1fr; }
             .drawer, .drawer-overlay { display: none !important; }
+
+            .report-container { 
+                box-shadow: none; 
+                padding: 8px; 
+                width: 100%; 
+                max-width: none; 
+                margin: 0;
+                page-break-inside: auto;
+            }
+
+            /* CRITICAL: Remove ALL overflow scrolling so every column prints */
+            .table-scroll, .behavior-scroll,
+            div[style*="overflow-x"], div[style*="overflow:auto"] {
+                overflow: visible !important;
+                max-width: none !important;
+                width: 100% !important;
+            }
+
+            /* Force tables to be fully visible */
+            .data-table, .behavior-table {
+                min-width: unset !important;
+                width: 100% !important;
+                table-layout: auto !important;
+                font-size: 9px !important;
+            }
+            .data-table th, .data-table td,
+            .behavior-table th, .behavior-table td {
+                padding: 3px 2px !important;
+                font-size: 9px !important;
+                word-break: break-word;
+            }
+
+            /* Shrink header for print */
+            .header-center h1 { font-size: 16px !important; }
+            .header-center h2 { font-size: 11px !important; }
+            .header-center h3 { font-size: 10px !important; }
+            .logo-placeholder { width: 100px !important; height: 100px !important; }
+            .img-placeholder { width: 80px !important; height: 95px !important; }
+
+            /* Grid layouts: keep side-by-side but allow fit */
+            .behavior-grid { grid-template-columns: 1fr 1fr; }
+            div[style*="grid-template-columns"] {
+                display: grid !important;
+            }
+
+            /* Info blocks: compact */
+            .info-table td { font-size: 11px !important; padding: 4px 3px !important; }
+            .section-header { font-size: 11px !important; padding: 5px !important; }
+
+            /* Page breaks */
+            .header { page-break-inside: avoid; }
+            table { page-break-inside: auto; }
+            tr { page-break-inside: avoid; page-break-after: auto; }
+
+            /* Comments compact */
+            .comments-table td { font-size: 11px !important; padding: 6px !important; }
+
+            /* Signature images should print */
+            img[src*="headmaster-signature"] { display: block !important; }
         }
 
         /* ── MOBILE ≤ 600px ── */
