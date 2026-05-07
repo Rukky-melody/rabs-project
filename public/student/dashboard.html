@@ -313,34 +313,102 @@
             img[src*="headmaster-signature"] { display: block !important; }
         }
 
+        /* ── Collapsible Info Accordion (mobile) ── */
+        .info-toggle-btn {
+            display: none; /* hidden on desktop */
+            width: 100%;
+            background: #003366;
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: left;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+        .info-toggle-btn i { float: right; transition: transform 0.3s; }
+        .info-toggle-btn.open i { transform: rotate(180deg); }
+
         /* ── MOBILE ≤ 600px ── */
         @media (max-width: 600px) {
-            body { padding: 8px; }
-            .report-container { padding: 14px; }
+            body { padding: 4px; }
+            .report-container { padding: 10px; }
 
-            /* Header stacks vertically — photo now in drawer, so only title + logo */
-            .header { flex-direction: column; align-items: center; text-align: center; gap: 10px; }
-            .header-center h1 { font-size: 15px; letter-spacing: 1px; }
-            .header-center h2 { font-size: 11px; }
-            .header-center h3 { font-size: 10px; }
-            .img-placeholder { width: 65px; height: 80px; font-size: 9px; }
-            .logo-placeholder { width: 90px; height: 90px; }
+            /* Compact header: single line logo + name */
+            .header {
+                flex-direction: row;
+                align-items: center;
+                text-align: left;
+                gap: 8px;
+                padding-bottom: 6px;
+                margin-bottom: 8px;
+                border-bottom: 2px solid #003366;
+            }
+            .header-center { text-align: center; }
+            .header-center h1 { font-size: 13px; letter-spacing: 0.5px; margin-bottom: 2px; }
+            .header-center h2 { font-size: 10px; margin-bottom: 2px; }
+            .header-center h3 { display: none; } /* hide address on mobile */
+            .logo-placeholder { width: 50px !important; height: 50px !important; }
 
-            /* Info and summary: single column */
-            .info-grid, .summary-grid { grid-template-columns: 1fr; gap: 10px; }
-            .info-table td { font-size: 12px; }
+            /* Hide the student photo on report (it's in the drawer) */
+            .img-placeholder { display: none; }
+
+            /* Report title compact */
+            .header-center h2#reportTitle {
+                font-size: 11px !important;
+                padding: 2px 8px !important;
+                margin-top: 3px !important;
+            }
+            .header-center div[style*="margin-top:4px"] {
+                font-size: 11px !important;
+            }
+
+            /* Show toggle button, hide info blocks by default */
+            .info-toggle-btn { display: block; }
+
+            .info-grid, .summary-grid,
+            #prenurseryInfoBlock, #nurseryInfoBlock,
+            #primaryInfoBlock, #jssInfoBlock {
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease;
+                margin-bottom: 0 !important;
+            }
+            .info-grid.expanded, .summary-grid.expanded,
+            #prenurseryInfoBlock.expanded, #nurseryInfoBlock.expanded,
+            #primaryInfoBlock.expanded, #jssInfoBlock.expanded {
+                max-height: 600px;
+                margin-bottom: 12px !important;
+            }
+
+            /* Info grids: single column */
+            .info-grid, .summary-grid { grid-template-columns: 1fr; gap: 6px; }
+            .info-table td { font-size: 11px; padding: 4px 3px; }
 
             /* Behavior tables: single column */
-            .behavior-grid { grid-template-columns: 1fr; gap: 14px; }
+            .behavior-grid { grid-template-columns: 1fr; gap: 10px; }
 
             /* Comments: stack label above value */
             .comments-table, .comments-table tbody,
             .comments-table tr { display: block; width: 100%; }
-            .comments-table td { display: block; width: 100%; }
+            .comments-table td { display: block; width: 100%; font-size: 12px; }
             .comments-table td.label { border-bottom: none; padding-bottom: 2px; background: #f3f4f6; width: 100%; }
-            .comments-table td:not(.label) { border-top: none; padding-top: 6px; }
+            .comments-table td:not(.label) { border-top: none; padding-top: 4px; }
 
-            .section-header { font-size: 12px; }
+            .section-header { font-size: 12px; padding: 6px; }
+
+            /* Data tables: shrink for mobile but keep visible */
+            .data-table { font-size: 10px; min-width: unset; }
+            .data-table th, .data-table td { padding: 4px 3px; font-size: 10px; }
+            .behavior-table { font-size: 10px; min-width: unset; }
+            .behavior-table th, .behavior-table td { padding: 3px 2px; font-size: 10px; }
+
+            /* Top bar compact */
+            .top-bar { margin-bottom: 8px; }
+            .btn-back { font-size: 11px; padding: 6px 10px; }
+            .term-selector { font-size: 11px; padding: 5px; }
         }
 
         /* ── TABLET 601–768px ── */
@@ -410,6 +478,11 @@
                 </div>
                 <div class="img-placeholder" id="reportPhoto">STUDENT<br>PHOTO</div>
             </div>
+
+            <!-- Collapsible Student Info Toggle (mobile only) -->
+            <button class="info-toggle-btn no-print" id="infoToggleBtn" onclick="toggleInfoBlock()">
+                &#128100; Student Details <i class="fa-solid fa-chevron-down"></i>
+            </button>
 
             <!-- Student Info Block: Standard (Nursery / Basic / JSS) -->
             <div class="info-grid" id="standardInfoBlock">
@@ -585,6 +658,19 @@
             document.getElementById('drawer').classList.remove('open');
             document.getElementById('drawerOverlay').classList.remove('open');
             document.getElementById('hamburgerBtn').classList.remove('open');
+        }
+
+        function toggleInfoBlock() {
+            const btn = document.getElementById('infoToggleBtn');
+            btn.classList.toggle('open');
+            // Toggle whichever info block is currently visible
+            const blocks = ['standardInfoBlock', 'prenurseryInfoBlock', 'nurseryInfoBlock', 'primaryInfoBlock', 'jssInfoBlock'];
+            blocks.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && el.style.display !== 'none') {
+                    el.classList.toggle('expanded');
+                }
+            });
         }
     </script>
     <script src="../js/student-dashboard.js"></script>
