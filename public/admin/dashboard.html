@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | RABS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/admin-dashboard.css">
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>RABS Admin</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-btn active" data-target="overview-section">Overview</button>
+                <button class="nav-btn" data-target="staff-section">Manage Staff</button>
+                <button class="nav-btn" data-target="students-section">View Students</button>
+                <button class="nav-btn" data-target="results-section">Published Results</button>
+                <button class="nav-btn logout-btn" id="logoutBtn">Logout</button>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <h1 id="pageTitle">Overview</h1>
+                <div class="admin-profile">
+                    <span id="adminNameDisplay">Welcome, Admin</span>
+                    <div class="avatar">A</div>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                
+                <!-- Overview Section -->
+                <section id="overview-section" class="content-section active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>Total Staff</h3>
+                            <p class="stat-value" id="statTotalStaff">--</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Total Classes</h3>
+                            <p class="stat-value" id="statTotalClasses">--</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Manage Staff Section -->
+                <section id="staff-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Staff Directory</h2>
+                        <button class="primary-btn" id="openAddStaffModal">Add New Staff</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Staff ID</th>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Assigned Class</th>
+                                    <th>Added On</th>
+                                </tr>
+                            </thead>
+                            <tbody id="staffTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- View Students Section -->
+                <section id="students-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Registered Students</h2>
+                        <p>Grouped by class</p>
+                    </div>
+                    <div id="studentsAccordion" class="accordion-container">
+                        <!-- Populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- Published Results Section -->
+                <section id="results-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Search Published Results</h2>
+                        <div class="search-bar">
+                            <input type="text" id="resultSearchInput" placeholder="Search by Student Name, ID, or Class...">
+                            <button id="searchResultBtn" class="primary-btn">Search</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Student Name</th>
+                                    <th>Class</th>
+                                    <th>Term</th>
+                                    <th>Published On</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsTableBody">
+                                <tr><td colspan="6" class="text-center">Search for a student to view their published reports.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Staff Modal -->
+    <div id="addStaffModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Staff</h2>
+                <button class="close-btn" id="closeAddStaffModal">&times;</button>
+            </div>
+            <form id="addStaffForm">
+                <div class="form-group">
+                    <label>Staff Name</label>
+                    <input type="text" id="newStaffName" required pattern="[A-Za-z\s]+" title="Only letters and spaces allowed">
+                </div>
+                <div class="form-group">
+                    <label>Staff ID (Unique)</label>
+                    <input type="text" id="newStaffId" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="newStaffPassword" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select id="newStaffRole" required>
+                        <option value="teacher">Teacher</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Assigned Class (Optional for Admins)</label>
+                    <input type="text" id="newStaffClass">
+                </div>
+                <button type="submit" class="primary-btn full-width">Register Staff</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/admin-dashboard.js"></script>
+</body>
+</html>

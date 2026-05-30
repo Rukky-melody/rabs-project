@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const jwt = require('jsonwebtoken');
 
 // ADMIN ACTION: Registering Teachers/Staff
 exports.registerStaff = async (req, res) => {
@@ -22,12 +23,22 @@ exports.loginStaff = async (req, res) => {
         const [rows] = await db.query('SELECT * FROM staff WHERE staff_id = ? AND password = ?', [staffId, password]);
         
         if (rows.length > 0) {
+            const user = rows[0];
+            
+            // Generate JWT Token
+            const token = jwt.sign(
+                { id: user.id, staffId: user.staff_id, role: user.role, name: user.staff_name },
+                process.env.JWT_SECRET,
+                { expiresIn: '8h' }
+            );
+
             res.status(200).json({ 
                 success: true, 
-                role: rows[0].role,
-                staffName: rows[0].staff_name,
-                staffId: rows[0].staff_id,
-                assignedClass: rows[0].assigned_class
+                token: token,
+                role: user.role,
+                staffName: user.staff_name,
+                staffId: user.staff_id,
+                assignedClass: user.assigned_class
             });
         } else {
             res.status(401).json({ success: false, message: "Invalid ID or Password" });

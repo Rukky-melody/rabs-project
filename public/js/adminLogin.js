@@ -19,11 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (data.success) {
                     // Critical Check: Ensure this person is actually an Admin
-                    if (data.role === 'admin') {
+                    if (data.role === 'admin' || data.role === 'Admin') {
+                        localStorage.setItem('authToken', data.token);
                         localStorage.setItem('currentStaffId', data.staffId);
                         localStorage.setItem('staffRole', data.role);
                         localStorage.setItem('staffName', data.staffName || 'Admin');
-                        window.location.href = 'reg.html';
+                        window.location.href = 'dashboard.html';
                     } else {
                         alert("Access Denied: You do not have Administrative privileges.");
                     }
