@@ -12,5 +12,6 @@ router.get('/staffs', adminController.getStaffs);
 router.get('/students', adminController.getStudentsByClass);
 router.get('/results/search', adminController.searchPublishedResults);
 router.delete('/student/:id', adminController.deleteStudent);
+router.delete('/staff/:id', adminController.deleteStaff);
 
 module.exports = router;

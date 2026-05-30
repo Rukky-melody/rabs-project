@@ -82,3 +82,18 @@ exports.deleteStudent = async (req, res) => {
         res.status(500).json({ success: false, message: "Failed to delete student." });
     }
 };
+
+// Delete a staff member
+exports.deleteStaff = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [result] = await db.query('DELETE FROM staff WHERE staff_id = ?', [id]);
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: "Staff not found." });
+        }
+        res.status(200).json({ success: true, message: "Staff member deleted successfully." });
+    } catch (error) {
+        console.error("Error deleting staff:", error);
+        res.status(500).json({ success: false, message: "Failed to delete staff." });
+    }
+};
