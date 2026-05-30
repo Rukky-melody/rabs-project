@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <td>${r.class_name || 'N/A'}</td>
                         <td>${r.term}</td>
                         <td>${date}</td>
-                        <td><button class="primary-btn" onclick="window.viewResultDetails('${r.student_id}', '${r.term}')" style="padding: 6px 12px; font-size: 0.8rem;">View Details</button></td>
+                        <td><button class="primary-btn" onclick="window.viewResultDetails('${r.student_id}', '${r.term}', '${r.student_name.replace(/'/g, "\\'")}')" style="padding: 6px 12px; font-size: 0.8rem;">View Details</button></td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -219,61 +219,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // View Result Modal Logic
-    window.viewResultDetails = async function(studentId, term) {
-        const viewModal = document.getElementById('viewResultModal');
-        const content = document.getElementById('viewResultContent');
-        viewModal.classList.add('active');
-        content.innerHTML = '<p class="text-center">Loading result details...</p>';
-
-        try {
-            // Re-using the teacher endpoint since it gets results by term
-            const res = await fetch(`/api/staff/results/${encodeURIComponent(studentId)}/${encodeURIComponent(term)}`);
-            const data = await res.json();
-            
-            if (data.success && data.results.length > 0) {
-                let html = `
-                    <div style="margin-bottom: 20px;">
-                        <p><strong>Student ID:</strong> ${studentId}</p>
-                        <p><strong>Term:</strong> ${term}</p>
-                    </div>
-                    <table class="data-table" style="box-shadow: none; border: 1px solid #e5e7eb; width: 100%;">
-                        <thead>
-                            <tr>
-                                <th>Subject</th>
-                                <th>1st Test</th>
-                                <th>2nd Test</th>
-                                <th>Exam</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-                data.results.forEach(r => {
-                    const total = (parseFloat(r.first_test) || 0) + (parseFloat(r.second_test) || 0) + (parseFloat(r.exam_score) || 0);
-                    html += `
-                        <tr>
-                            <td>${r.subject}</td>
-                            <td>${r.first_test || 0}</td>
-                            <td>${r.second_test || 0}</td>
-                            <td>${r.exam_score || 0}</td>
-                            <td style="font-weight: 600;">${total}</td>
-                        </tr>
-                    `;
-                });
-                html += `</tbody></table>`;
-                content.innerHTML = html;
-            } else {
-                content.innerHTML = `<p class="text-center" style="color: red;">No detailed results found.</p>`;
-            }
-        } catch (error) {
-            console.error(error);
-            content.innerHTML = `<p class="text-center" style="color: red;">Failed to fetch results.</p>`;
-        }
+    // View Result Details Redirect
+    window.viewResultDetails = function(studentId, term, studentName) {
+        window.location.href = `../student/dashboard.html?studentId=${encodeURIComponent(studentId)}&term=${encodeURIComponent(term)}&studentName=${encodeURIComponent(studentName)}&adminView=true`;
     };
-
-    document.getElementById('closeViewResultModal').addEventListener('click', () => {
-        document.getElementById('viewResultModal').classList.remove('active');
-    });
 
 });

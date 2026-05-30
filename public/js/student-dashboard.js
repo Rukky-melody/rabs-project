@@ -1,13 +1,25 @@
 // Gatekeeper: redirect if not logged in
-const studentId   = localStorage.getItem('currentStudentId');
-const studentName = localStorage.getItem('studentName');
-const studentClass = localStorage.getItem('studentClass') || 'N/A';
-const studentPhoto = localStorage.getItem('studentPhoto') || '';
+const urlParams = new URLSearchParams(window.location.search);
+const adminView = urlParams.get('adminView') === 'true';
 
-if (!studentId) {
-    window.location.href = 'login.html';
+let studentId   = localStorage.getItem('currentStudentId');
+let studentName = localStorage.getItem('studentName');
+let studentClass = localStorage.getItem('studentClass') || 'N/A';
+let studentPhoto = localStorage.getItem('studentPhoto') || '';
+
+if (adminView) {
+    studentId = urlParams.get('studentId');
+    studentName = decodeURIComponent(urlParams.get('studentName') || 'Student');
+    // Hide hamburger menu and update back button for admins
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    if (hamburgerBtn) hamburgerBtn.style.display = 'none';
+    const backBtn = document.querySelector('.btn-back');
+    if (backBtn) backBtn.onclick = () => window.location.href = '../admin/dashboard.html';
+} else {
+    if (!studentId) {
+        window.location.href = 'login.html';
+    }
 }
-
 // Populate the side drawer
 const drawerNameEl = document.getElementById('drawerName');
 const drawerIdEl   = document.getElementById('drawerId');
@@ -903,4 +915,9 @@ function logout() {
 }
 
 // Initial fetch
-fetchResults('First Term');
+const initialTerm = urlParams.get('term') || 'First Term';
+const termSelector = document.getElementById('termSelector');
+if (termSelector) {
+    termSelector.value = initialTerm;
+}
+fetchResults(initialTerm);
