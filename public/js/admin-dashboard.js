@@ -67,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <td><span style="padding: 4px 8px; border-radius: 4px; background: ${staff.role.toLowerCase() === 'admin' ? '#fee2e2' : '#e0e7ff'}; color: ${staff.role.toLowerCase() === 'admin' ? '#991b1b' : '#3730a3'}; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">${staff.role}</span></td>
                         <td>${staff.assigned_class || 'None'}</td>
                         <td>${date}</td>
+                        <td><button onclick="window.deleteStaff('${staff.staff_id}')" style="background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">Delete</button></td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -246,6 +247,29 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error(error);
             alert("Error deleting student.");
+        }
+    };
+
+    // Delete Staff Logic
+    window.deleteStaff = async function(staffId) {
+        if (!confirm(`Are you sure you want to delete staff member ${staffId}? This action cannot be undone.`)) {
+            return;
+        }
+        try {
+            const res = await fetch(`/api/admin/staff/${encodeURIComponent(staffId)}`, {
+                method: 'DELETE',
+                headers: authHeaders
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert(data.message);
+                fetchStaffs(); // refresh the list
+            } else {
+                alert("Failed to delete staff: " + data.message);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error deleting staff.");
         }
     };
 
