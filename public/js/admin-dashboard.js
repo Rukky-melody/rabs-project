@@ -15,6 +15,55 @@ document.addEventListener('DOMContentLoaded', () => {
         'Content-Type': 'application/json'
     };
 
+    // Custom Alert System
+    window.showCustomAlert = function(title, message, isError = false) {
+        const overlay = document.getElementById('customAlertOverlay');
+        const icon = document.getElementById('customAlertIcon');
+        const titleEl = document.getElementById('customAlertTitle');
+        const msgEl = document.getElementById('customAlertMessage');
+        const btnsEl = document.getElementById('customAlertButtons');
+
+        icon.className = 'custom-alert-icon ' + (isError ? 'danger' : 'info');
+        icon.textContent = isError ? '!' : 'i';
+        titleEl.textContent = title;
+        msgEl.textContent = message;
+
+        btnsEl.innerHTML = `<button class="btn-custom btn-custom-primary" id="customAlertOkBtn">OK</button>`;
+        overlay.classList.add('active');
+
+        document.getElementById('customAlertOkBtn').onclick = () => {
+            overlay.classList.remove('active');
+        };
+    };
+
+    window.showCustomConfirm = function(title, message, onConfirm) {
+        const overlay = document.getElementById('customAlertOverlay');
+        const icon = document.getElementById('customAlertIcon');
+        const titleEl = document.getElementById('customAlertTitle');
+        const msgEl = document.getElementById('customAlertMessage');
+        const btnsEl = document.getElementById('customAlertButtons');
+
+        icon.className = 'custom-alert-icon danger';
+        icon.textContent = '!';
+        titleEl.textContent = title;
+        msgEl.textContent = message;
+
+        btnsEl.innerHTML = `
+            <button class="btn-custom btn-custom-secondary" id="customAlertCancelBtn">Cancel</button>
+            <button class="btn-custom btn-custom-danger" id="customAlertConfirmBtn">Confirm</button>
+        `;
+        overlay.classList.add('active');
+
+        document.getElementById('customAlertCancelBtn').onclick = () => {
+            overlay.classList.remove('active');
+        };
+        
+        document.getElementById('customAlertConfirmBtn').onclick = () => {
+            overlay.classList.remove('active');
+            onConfirm();
+        };
+    };
+
     // Set Welcome Name
     const staffName = localStorage.getItem('staffName');
     if (staffName) {
@@ -144,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('searchResultBtn').addEventListener('click', async () => {
         const query = document.getElementById('resultSearchInput').value.trim();
         if (!query) {
-            alert("Please enter a search term.");
+            window.showCustomAlert("Notice", "Please enter a search term.");
             return;
         }
 
@@ -209,16 +258,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await res.json();
             
             if (data.success) {
-                alert("Staff added successfully!");
+                window.showCustomAlert("Success", "Staff added successfully!");
                 modal.classList.remove('active');
                 document.getElementById('addStaffForm').reset();
                 fetchStaffs(); // Refresh table
             } else {
-                alert("Failed: " + data.message);
+                window.showCustomAlert("Error", "Failed: " + data.message, true);
             }
         } catch (error) {
             console.error(error);
-            alert("Error adding staff.");
+            window.showCustomAlert("Error", "Error adding staff.", true);
         }
     });
 
@@ -228,49 +277,47 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Delete Student Logic
-    window.deleteStudent = async function(studentId) {
-        if (!confirm(`Are you sure you want to delete student ${studentId}? This will also delete all their results and cannot be undone.`)) {
-            return;
-        }
-        try {
-            const res = await fetch(`/api/admin/student/${encodeURIComponent(studentId)}`, {
-                method: 'DELETE',
-                headers: authHeaders
-            });
-            const data = await res.json();
-            if (data.success) {
-                alert(data.message);
-                fetchStudents(); // refresh the list
-            } else {
-                alert("Failed to delete student: " + data.message);
+    window.deleteStudent = function(studentId) {
+        window.showCustomConfirm("Delete Student", `Are you sure you want to delete student ${studentId}? This will also delete all their results and cannot be undone.`, async () => {
+            try {
+                const res = await fetch(`/api/admin/student/${encodeURIComponent(studentId)}`, {
+                    method: 'DELETE',
+                    headers: authHeaders
+                });
+                const data = await res.json();
+                if (data.success) {
+                    window.showCustomAlert("Success", data.message);
+                    fetchStudents(); // refresh the list
+                } else {
+                    window.showCustomAlert("Error", "Failed to delete student: " + data.message, true);
+                }
+            } catch (error) {
+                console.error(error);
+                window.showCustomAlert("Error", "Error deleting student.", true);
             }
-        } catch (error) {
-            console.error(error);
-            alert("Error deleting student.");
-        }
+        });
     };
 
     // Delete Staff Logic
-    window.deleteStaff = async function(staffId) {
-        if (!confirm(`Are you sure you want to delete staff member ${staffId}? This action cannot be undone.`)) {
-            return;
-        }
-        try {
-            const res = await fetch(`/api/admin/staff/${encodeURIComponent(staffId)}`, {
-                method: 'DELETE',
-                headers: authHeaders
-            });
-            const data = await res.json();
-            if (data.success) {
-                alert(data.message);
-                fetchStaffs(); // refresh the list
-            } else {
-                alert("Failed to delete staff: " + data.message);
+    window.deleteStaff = function(staffId) {
+        window.showCustomConfirm("Delete Staff", `Are you sure you want to delete staff member ${staffId}? This action cannot be undone.`, async () => {
+            try {
+                const res = await fetch(`/api/admin/staff/${encodeURIComponent(staffId)}`, {
+                    method: 'DELETE',
+                    headers: authHeaders
+                });
+                const data = await res.json();
+                if (data.success) {
+                    window.showCustomAlert("Success", data.message);
+                    fetchStaffs(); // refresh the list
+                } else {
+                    window.showCustomAlert("Error", "Failed to delete staff: " + data.message, true);
+                }
+            } catch (error) {
+                console.error(error);
+                window.showCustomAlert("Error", "Error deleting staff.", true);
             }
-        } catch (error) {
-            console.error(error);
-            alert("Error deleting staff.");
-        }
+        });
     };
 
 });
