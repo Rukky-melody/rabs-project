@@ -264,11 +264,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 html += `</tbody></table>`;
                 content.innerHTML = html;
             } else {
-                content.innerHTML = \`<p class="text-center" style="color: red;">No detailed results found.</p>\`;
+                content.innerHTML = `<p class="text-center" style="color: red;">No detailed results found.</p>`;
             }
         } catch (error) {
             console.error(error);
-            content.innerHTML = \`<p class="text-center" style="color: red;">Failed to fetch results.</p>\`;
+            content.innerHTML = `<p class="text-center" style="color: red;">Failed to fetch results.</p>`;
         }
     };
 
