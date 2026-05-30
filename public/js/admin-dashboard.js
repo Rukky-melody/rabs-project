@@ -107,6 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                             <th>ID</th>
                                             <th>Name</th>
                                             <th>Added On</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -115,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                                 <td>${s.generated_id}</td>
                                                 <td>${s.student_name}</td>
                                                 <td>${new Date(s.created_at).toLocaleDateString()}</td>
+                                                <td><button onclick="window.deleteStudent('${s.generated_id}')" style="background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">Delete</button></td>
                                             </tr>
                                         `).join('')}
                                     </tbody>
@@ -222,6 +224,29 @@ document.addEventListener('DOMContentLoaded', () => {
     // View Result Details Redirect
     window.viewResultDetails = function(studentId, term, studentName) {
         window.location.href = `../student/dashboard.html?studentId=${encodeURIComponent(studentId)}&term=${encodeURIComponent(term)}&studentName=${encodeURIComponent(studentName)}&adminView=true`;
+    };
+
+    // Delete Student Logic
+    window.deleteStudent = async function(studentId) {
+        if (!confirm(`Are you sure you want to delete student ${studentId}? This will also delete all their results and cannot be undone.`)) {
+            return;
+        }
+        try {
+            const res = await fetch(`/api/admin/student/${encodeURIComponent(studentId)}`, {
+                method: 'DELETE',
+                headers: authHeaders
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert(data.message);
+                fetchStudents(); // refresh the list
+            } else {
+                alert("Failed to delete student: " + data.message);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error deleting student.");
+        }
     };
 
 });

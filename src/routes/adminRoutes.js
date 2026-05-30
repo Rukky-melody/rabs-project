@@ -11,5 +11,6 @@ router.post('/register-staff', authController.registerStaff);
 router.get('/staffs', adminController.getStaffs);
 router.get('/students', adminController.getStudentsByClass);
 router.get('/results/search', adminController.searchPublishedResults);
+router.delete('/student/:id', adminController.deleteStudent);
 
 module.exports = router;

@@ -67,3 +67,18 @@ exports.searchPublishedResults = async (req, res) => {
         res.status(500).json({ success: false, message: "Failed to search results." });
     }
 };
+
+// Delete a student and all their associated results (cascades)
+exports.deleteStudent = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [result] = await db.query('DELETE FROM students WHERE generated_id = ?', [id]);
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: "Student not found." });
+        }
+        res.status(200).json({ success: true, message: "Student and all records deleted successfully." });
+    } catch (error) {
+        console.error("Error deleting student:", error);
+        res.status(500).json({ success: false, message: "Failed to delete student." });
+    }
+};
