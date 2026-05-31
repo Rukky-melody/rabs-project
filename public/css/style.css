@@ -156,9 +156,25 @@ p {
 }
 
 .auth-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, var(--primary-bg), rgba(99, 102, 241, 0.15));
+  border: 1px solid var(--primary-border);
   color: var(--primary);
-  margin-bottom: 12px;
-  font-size: 2.5rem;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);
+  backdrop-filter: blur(8px);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.auth-icon:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(99, 102, 241, 0.25);
 }
 
 .auth-header h1 {
