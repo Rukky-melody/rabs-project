@@ -11,7 +11,11 @@ exports.registerStaff = async (req, res) => {
         
         res.status(201).json({ success: true, message: "Staff account created successfully." });
     } catch (error) {
-        res.status(500).json({ success: false, message: "Error creating staff account." });
+        console.error("Error creating staff:", error);
+        if (error.code === 'ER_DUP_ENTRY') {
+            return res.status(400).json({ success: false, message: "A staff member with this ID already exists." });
+        }
+        res.status(500).json({ success: false, message: "Error creating staff account. Please try again." });
     }
 };
 
