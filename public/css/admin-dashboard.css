@@ -558,18 +558,21 @@ h1, h2, h3 { font-weight: 600; }
     .desktop-only {
         display: none !important;
     }
-
-    .mobile-sidebar-profile {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-weight: 500;
-        padding: 20px 24px;
-        border-bottom: 1px solid var(--sidebar-hover);
-        color: #fff;
-    }
 }
 
+/* Mobile profile block — hidden on desktop, shown in sidebar on mobile */
 .mobile-sidebar-profile {
     display: none;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--sidebar-hover);
+    color: #fff;
+}
+
+@media (max-width: 768px) {
+    .mobile-sidebar-profile {
+        display: flex;
+    }
 }
