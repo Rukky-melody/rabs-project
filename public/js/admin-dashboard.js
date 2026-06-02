@@ -67,8 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set Welcome Name
     const staffName = localStorage.getItem('staffName');
     if (staffName) {
-        document.getElementById('adminNameDisplay').textContent = `Welcome, ${staffName}`;
-        document.querySelector('.avatar').textContent = staffName.charAt(0).toUpperCase();
+        document.querySelectorAll('.admin-name-display').forEach(el => el.textContent = `Welcome, ${staffName}`);
+        document.querySelectorAll('.admin-avatar').forEach(el => el.textContent = staffName.charAt(0).toUpperCase());
     }
 
     // Navigation Logic
