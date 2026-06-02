@@ -318,7 +318,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.showCustomAlert("Error", "Error deleting staff.", true);
             }
         });
-        });
     };
 
     // Mobile Sidebar Toggle
