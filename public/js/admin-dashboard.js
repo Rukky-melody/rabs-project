@@ -197,6 +197,48 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Dynamic Student Name Search Filtering (Client-side)
+    const studentSearchInput = document.getElementById('studentSearchInput');
+    if (studentSearchInput) {
+        studentSearchInput.addEventListener('input', () => {
+            const query = studentSearchInput.value.toLowerCase().trim();
+            const accordionItems = document.querySelectorAll('#studentsAccordion .accordion-item');
+            
+            accordionItems.forEach(item => {
+                const rows = item.querySelectorAll('tbody tr');
+                let matchCount = 0;
+                
+                rows.forEach(row => {
+                    // Second column is Student Name
+                    const nameCell = row.cells[1];
+                    if (nameCell) {
+                        const nameText = nameCell.textContent.toLowerCase();
+                        if (nameText.includes(query)) {
+                            row.style.display = '';
+                            matchCount++;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    }
+                });
+                
+                if (query === '') {
+                    // Reset all classes to visible and collapsed when query is empty
+                    item.style.display = '';
+                    item.classList.remove('active');
+                } else if (matchCount > 0) {
+                    // If a student matches in this class, show class and expand accordion
+                    item.style.display = '';
+                    item.classList.add('active');
+                } else {
+                    // Hide class if no student matches
+                    item.style.display = 'none';
+                    item.classList.remove('active');
+                }
+            });
+        });
+    }
+
     // Search Results Function
     document.getElementById('searchResultBtn').addEventListener('click', async () => {
         const query = document.getElementById('resultSearchInput').value.trim();
