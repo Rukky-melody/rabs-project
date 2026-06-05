@@ -138,24 +138,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const classes = Object.keys(data.classes);
                 document.getElementById('statTotalClasses').textContent = classes.length;
 
-                // Calculate total students and update UI progress bar
+                // Calculate total students
                 let totalStudents = 0;
                 classes.forEach(className => {
                     totalStudents += data.classes[className].length;
                 });
 
-                const targetCapacity = 100;
-                const percentage = Math.min(Math.round((totalStudents / targetCapacity) * 100), 100);
-
                 document.getElementById('statTotalStudents').textContent = totalStudents;
-                
-                // Trigger animation on next paint
-                setTimeout(() => {
-                    const bar = document.getElementById('studentProgressBar');
-                    if (bar) bar.style.width = `${percentage}%`;
-                }, 100);
-
-                document.getElementById('progressPercentage').textContent = `${percentage}% of capacity reached (${targetCapacity} limit)`;
 
                 classes.forEach(className => {
                     const students = data.classes[className];
