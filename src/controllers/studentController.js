@@ -6,6 +6,15 @@ exports.registerStudent = async (req, res) => {
     const photoUrl = req.file ? req.file.path : null;
 
     try {
+        // Check if student with same name already exists (case-insensitive)
+        const [existing] = await db.query('SELECT id FROM students WHERE LOWER(TRIM(student_name)) = LOWER(TRIM(?))', [name]);
+        if (existing.length > 0) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "A student with this name is already registered." 
+            });
+        }
+
         // Generate Unique ID: RABS-2026-XXXX
         const year = new Date().getFullYear();
         const random = Math.floor(1000 + Math.random() * 9000);
