@@ -138,6 +138,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 const classes = Object.keys(data.classes);
                 document.getElementById('statTotalClasses').textContent = classes.length;
 
+                // Calculate total students and update UI progress bar
+                let totalStudents = 0;
+                classes.forEach(className => {
+                    totalStudents += data.classes[className].length;
+                });
+
+                const targetCapacity = 100;
+                const percentage = Math.min(Math.round((totalStudents / targetCapacity) * 100), 100);
+
+                document.getElementById('statTotalStudents').textContent = totalStudents;
+                
+                // Trigger animation on next paint
+                setTimeout(() => {
+                    const bar = document.getElementById('studentProgressBar');
+                    if (bar) bar.style.width = `${percentage}%`;
+                }, 100);
+
+                document.getElementById('progressPercentage').textContent = `${percentage}% of capacity reached (${targetCapacity} limit)`;
+
                 classes.forEach(className => {
                     const students = data.classes[className];
                     
@@ -235,8 +254,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Add Staff Modal Logic
     const modal = document.getElementById('addStaffModal');
+    const newStaffPasswordToggle = document.getElementById('pwToggleNewStaff');
+    const newStaffPasswordInput = document.getElementById('newStaffPassword');
+    const newStaffPasswordIcon = document.getElementById('pwIconNewStaff');
+
     document.getElementById('openAddStaffModal').addEventListener('click', () => modal.classList.add('active'));
-    document.getElementById('closeAddStaffModal').addEventListener('click', () => modal.classList.remove('active'));
+    document.getElementById('closeAddStaffModal').addEventListener('click', () => {
+        modal.classList.remove('active');
+        if (newStaffPasswordInput) newStaffPasswordInput.type = 'password';
+        if (newStaffPasswordIcon) {
+            newStaffPasswordIcon.classList.add('fa-eye');
+            newStaffPasswordIcon.classList.remove('fa-eye-slash');
+        }
+    });
+
+    if (newStaffPasswordToggle && newStaffPasswordInput && newStaffPasswordIcon) {
+        newStaffPasswordToggle.addEventListener('click', () => {
+            const isHidden = newStaffPasswordInput.type === 'password';
+            newStaffPasswordInput.type = isHidden ? 'text' : 'password';
+            newStaffPasswordIcon.classList.toggle('fa-eye', !isHidden);
+            newStaffPasswordIcon.classList.toggle('fa-eye-slash', isHidden);
+        });
+    }
 
     document.getElementById('addStaffForm').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -261,6 +300,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.showCustomAlert("Success", "Staff added successfully!");
                 modal.classList.remove('active');
                 document.getElementById('addStaffForm').reset();
+                if (newStaffPasswordInput) newStaffPasswordInput.type = 'password';
+                if (newStaffPasswordIcon) {
+                    newStaffPasswordIcon.classList.add('fa-eye');
+                    newStaffPasswordIcon.classList.remove('fa-eye-slash');
+                }
                 fetchStaffs(); // Refresh table
             } else {
                 window.showCustomAlert("Error", "Failed: " + data.message, true);

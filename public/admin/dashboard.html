@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | RABS</title>
+    <link rel="icon" type="image/png" href="../favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/admin-dashboard.css">
 </head>
+
 <body>
 
     <div class="dashboard-container">
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
+                <img src="../favicon.png" alt="RABS Logo" class="sidebar-logo">
                 <h2>RABS Admin</h2>
             </div>
             <div class="mobile-sidebar-profile">
@@ -46,7 +51,7 @@
             </header>
 
             <div class="content-wrapper">
-                
+
                 <!-- Overview Section -->
                 <section id="overview-section" class="content-section active">
                     <div class="stats-grid">
@@ -102,7 +107,8 @@
                     <div class="section-header">
                         <h2>Search Published Results</h2>
                         <div class="search-bar">
-                            <input type="text" id="resultSearchInput" placeholder="Search by Student Name, ID, or Class...">
+                            <input type="text" id="resultSearchInput"
+                                placeholder="Search by Student Name, ID, or Class...">
                             <button id="searchResultBtn" class="primary-btn">Search</button>
                         </div>
                     </div>
@@ -119,7 +125,10 @@
                                 </tr>
                             </thead>
                             <tbody id="resultsTableBody">
-                                <tr><td colspan="6" class="text-center">Search for a student to view their published reports.</td></tr>
+                                <tr>
+                                    <td colspan="6" class="text-center">Search for a student to view their published
+                                        reports.</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -139,7 +148,8 @@
             <form id="addStaffForm">
                 <div class="form-group">
                     <label>Staff Name</label>
-                    <input type="text" id="newStaffName" required pattern="[A-Za-z\s]+" title="Only letters and spaces allowed">
+                    <input type="text" id="newStaffName" required pattern="[A-Za-z\s]+"
+                        title="Only letters and spaces allowed">
                 </div>
                 <div class="form-group">
                     <label>Staff ID (Unique)</label>
@@ -147,7 +157,12 @@
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" id="newStaffPassword" required minlength="6">
+                    <div class="pw-wrapper">
+                        <input type="password" id="newStaffPassword" required minlength="6" placeholder="••••••••">
+                        <button type="button" class="pw-toggle" id="pwToggleNewStaff" aria-label="Toggle password visibility">
+                            <i class="fa-solid fa-eye" id="pwIconNewStaff"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Role</label>
@@ -159,7 +174,7 @@
                 <div class="form-group">
                     <label>Assigned Class (Optional for Admins)</label>
                     <select id="newStaffClass">
-                        <option value="">Select a class (Optional)</option>
+                        <option value="">Select a class</option>
                         <option value="CRECHE">CRECHE</option>
                         <option value="PRE-NURSERY">PRE-NURSERY</option>
                         <option value="NURSERY 1">NURSERY 1</option>
@@ -207,4 +222,5 @@
 
     <script src="../js/admin-dashboard.js"></script>
 </body>
+
 </html>
