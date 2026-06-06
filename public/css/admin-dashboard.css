@@ -170,6 +170,32 @@ h1, h2, h3 { font-weight: 600; }
     margin-bottom: 24px;
 }
 
+#students-section .section-header .search-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+#students-section .section-header .search-bar .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+    font-size: 0.95rem;
+    z-index: 2;
+    transition: color 0.2s ease;
+}
+
+#students-section .section-header .search-bar input {
+    padding-left: 40px;
+}
+
+#students-section .section-header .search-bar input:focus ~ .search-icon {
+    color: var(--primary-color);
+}
+
 /* Center search bar in students section header on desktop */
 @media (min-width: 901px) {
     #students-section .section-header h2 {
@@ -180,11 +206,15 @@ h1, h2, h3 { font-weight: 600; }
         display: flex;
         justify-content: center;
     }
+    #students-section .section-header .search-bar input {
+        width: 550px;
+    }
     #students-section .section-header p {
         flex: 1;
         text-align: right;
     }
 }
+
 
 
 /* Buttons */
