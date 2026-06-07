@@ -170,13 +170,15 @@ h1, h2, h3 { font-weight: 600; }
     margin-bottom: 24px;
 }
 
-#students-section .section-header .search-bar {
+#students-section .section-header .search-bar,
+#staff-section .section-header .search-bar {
     position: relative;
     display: flex;
     align-items: center;
 }
 
-#students-section .section-header .search-bar .search-icon {
+#students-section .section-header .search-bar .search-icon,
+#staff-section .section-header .search-bar .search-icon {
     position: absolute;
     left: 14px;
     top: 50%;
@@ -188,30 +190,37 @@ h1, h2, h3 { font-weight: 600; }
     transition: color 0.2s ease;
 }
 
-#students-section .section-header .search-bar input {
+#students-section .section-header .search-bar input,
+#staff-section .section-header .search-bar input {
     padding-left: 40px;
 }
 
-#students-section .section-header .search-bar input:focus ~ .search-icon {
+#students-section .section-header .search-bar input:focus ~ .search-icon,
+#staff-section .section-header .search-bar input:focus ~ .search-icon {
     color: var(--primary-color);
 }
 
-/* Center search bar in students section header on desktop */
+/* Center search bar in section header on desktop */
 @media (min-width: 901px) {
-    #students-section .section-header h2 {
+    #students-section .section-header h2,
+    #staff-section .section-header h2 {
         flex: 1;
     }
-    #students-section .section-header .search-bar {
+    #students-section .section-header .search-bar,
+    #staff-section .section-header .search-bar {
         flex: 0 0 auto;
         display: flex;
         justify-content: center;
     }
-    #students-section .section-header .search-bar input {
+    #students-section .section-header .search-bar input,
+    #staff-section .section-header .search-bar input {
         width: 550px;
     }
-    #students-section .section-header p {
+    #students-section .section-header p,
+    #staff-section .section-header .btn-wrapper {
         flex: 1;
-        text-align: right;
+        display: flex;
+        justify-content: flex-end;
     }
 }
 
@@ -608,6 +617,10 @@ h1, h2, h3 { font-weight: 600; }
     }
     
     .primary-btn {
+        width: 100%;
+    }
+
+    .btn-wrapper {
         width: 100%;
     }
 

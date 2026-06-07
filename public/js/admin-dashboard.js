@@ -120,6 +120,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     `;
                     tbody.appendChild(tr);
                 });
+
+                // Apply search filter if query exists
+                const searchInput = document.getElementById('staffSearchInput');
+                if (searchInput && searchInput.value) {
+                    searchInput.dispatchEvent(new Event('input'));
+                }
             }
         } catch (error) {
             console.error("Failed to fetch staff:", error);
@@ -236,6 +242,50 @@ document.addEventListener('DOMContentLoaded', () => {
                     item.classList.remove('active');
                 }
             });
+        });
+    }
+
+    // Dynamic Staff Search Filtering (Client-side)
+    const staffSearchInput = document.getElementById('staffSearchInput');
+    if (staffSearchInput) {
+        staffSearchInput.addEventListener('input', () => {
+            const query = staffSearchInput.value.toLowerCase().trim();
+            const tbody = document.getElementById('staffTableBody');
+            const rows = tbody.querySelectorAll('tr:not(.no-matches-row)');
+            
+            // Remove existing no-matches row if any
+            const existingNoMatch = tbody.querySelector('.no-matches-row');
+            if (existingNoMatch) {
+                existingNoMatch.remove();
+            }
+            
+            let visibleCount = 0;
+            rows.forEach(row => {
+                const idText = row.cells[0]?.textContent.toLowerCase() || '';
+                const nameText = row.cells[1]?.textContent.toLowerCase() || '';
+                const roleText = row.cells[2]?.textContent.toLowerCase() || '';
+                const classText = row.cells[3]?.textContent.toLowerCase() || '';
+                
+                if (idText.includes(query) || nameText.includes(query) || roleText.includes(query) || classText.includes(query)) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            if (visibleCount === 0 && rows.length > 0) {
+                const tr = document.createElement('tr');
+                tr.className = 'no-matches-row';
+                const td = document.createElement('td');
+                td.colSpan = 6;
+                td.className = 'text-center';
+                td.style.color = 'var(--text-muted)';
+                td.style.padding = '24px';
+                td.textContent = `No staff members found matching "${query}"`;
+                tr.appendChild(td);
+                tbody.appendChild(tr);
+            }
         });
     }
 
